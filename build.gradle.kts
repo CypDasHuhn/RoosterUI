@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "2.1.20"
 }
@@ -24,4 +26,8 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+    freeCompilerArgs.set(listOf("-XXLanguage:+WhenGuards"))
 }

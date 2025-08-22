@@ -1,7 +1,5 @@
 package dev.cypdashuhn.rooster.ui.items
 
-import dev.cypdashuhn.rooster.caching.InterfaceChachableLambda
-import dev.cypdashuhn.rooster.caching.InterfaceDependency
 import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
@@ -21,9 +19,9 @@ class ItemBuilder<T : Context> {
 
     private var slots: Array<Int>? = null
     private var condition: ConditionMap<T>
-    private var priority = InterfaceChachableLambda<T, Int>(0)
+    private var priority: (InterfaceInfo<T>.() -> Int) = { -1 }
 
-    private var items: InterfaceChachableLambda<T, ItemStack>? = null
+    private var items: (InterfaceInfo<T>.() -> ItemStack)? = null
 
     private var action: ClickInfo<T>.() -> Unit = { }
 
@@ -40,10 +38,9 @@ class ItemBuilder<T : Context> {
 
     fun usedWhen(
         conditionKey: String = ConditionMap.ANONYMOUS_KEY,
-        dependency: InterfaceDependency<T> = InterfaceDependency.all<T>(),
         condition: InterfaceInfo<T>.() -> Boolean
     ) = copy {
-        this.condition.set(condition, conditionKey, dependency)
+        this.condition.set(condition, conditionKey)
     }
 
     fun atSlot(slot: Int) = copy {
@@ -64,27 +61,20 @@ class ItemBuilder<T : Context> {
 
     fun priority(
         priority: InterfaceInfo<T>.() -> Int,
-        dependency: InterfaceDependency<T> = InterfaceDependency.all<T>()
     ): ItemBuilder<T> = copy {
-        this.priority = InterfaceChachableLambda(priority, dependency)
+        this.priority = { it: InterfaceInfo<T> -> priority(it) }
     }
 
     fun priority(priority: Int): ItemBuilder<T> = copy {
-        this.priority = InterfaceChachableLambda(priority)
+        this.priority = { it: InterfaceInfo<T> -> priority }
     }
 
     fun onClick(action: ClickInfo<T>.() -> Unit): ItemBuilder<T> = copy { this.action = action }
 
     fun displayAs(itemStackCreator: InterfaceInfo<T>.() -> ItemStack) =
-        copy { this.items = itemStackCreator.toInterfaceChachableLambda() }
+        copy { this.items = itemStackCreator }
 
-    fun displayAs(
-        dependency: InterfaceDependency<T>,
-        itemStackCreator: InterfaceInfo<T>.() -> ItemStack,
-    ) =
-        copy { this.items = itemStackCreator.toInterfaceChachableLambda(dependency) }
-
-    fun displayAs(itemStack: ItemStack): ItemBuilder<T> = copy { this.items = InterfaceChachableLambda(itemStack) }
+    fun displayAs(itemStack: ItemStack): ItemBuilder<T> = copy { this.items = { itemStack } }
 
     fun copy(modifyingBlock: ItemBuilder<T>.() -> Unit): ItemBuilder<T> {
         val copy = ItemBuilder<T>(contextClass).also {
@@ -107,32 +97,23 @@ class ItemBuilder<T : Context> {
 
         var get: (InterfaceInfo<T>) -> ItemBuilder<T>? = { info ->
             staticPriorityItemsSorted = staticPriorityItems
-                .map { it to it.priority.get(info) }
+                .map { it to it.priority(info) }
                 .sortedByDescending { it.second }
 
             get = { info: InterfaceInfo<T> ->
                 val entry = staticPriorityItemsSorted!!.firstOrNull { (item, _) -> item.condition.flattend(info) }
                 val condition =
                     if (entry == null) { it: ItemBuilder<T> -> true }
-                    else { it: ItemBuilder<T> -> it.priority.get(info) > entry.second }
+                    else { it: ItemBuilder<T> -> it.priority(info) > entry.second }
                 val other = dynamicPriorityItems.firstOrNull { it.condition.flattend(info) && condition(it) }
                 other ?: entry?.first
             }
 
             get(info)
         }
-
-        init {
-            val grouped = items.groupBy { it.priority.dependency.dependsOnNothing }
-            staticPriorityItems = grouped[true] ?: emptyList()
-            dynamicPriorityItems = (grouped[false] ?: emptyList())
-        }
     }
 }
 
-fun <T : Context, E> (InterfaceInfo<T>.() -> E).toInterfaceChachableLambda(
-    dependency: InterfaceDependency<T> = InterfaceDependency.all()
-) = InterfaceChachableLambda(this, dependency)
 
 fun main() {
 

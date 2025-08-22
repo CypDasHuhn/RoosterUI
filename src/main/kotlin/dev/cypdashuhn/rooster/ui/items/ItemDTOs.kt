@@ -1,7 +1,5 @@
 package dev.cypdashuhn.rooster.ui.items
 
-import dev.cypdashuhn.rooster.caching.InterfaceChachableLambda
-import dev.cypdashuhn.rooster.caching.InterfaceDependency
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
@@ -11,10 +9,11 @@ import dev.cypdashuhn.rooster.util.nextName
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import java.util.function.Predicate
 import kotlin.reflect.KClass
 
 class ConditionMap<T : Context> {
-    private constructor(map: Map<String, InterfaceChachableLambda<T, Boolean>>, clazz: KClass<T>) {
+    private constructor(map: Map<String, ((InterfaceInfo<T>) -> Boolean)>, clazz: KClass<T>) {
         this.conditionMap = map.toMutableMap()
         this.clazz = clazz
     }
@@ -27,23 +26,21 @@ class ConditionMap<T : Context> {
         const val ANONYMOUS_KEY = "ANONYMOUS"
     }
 
-    private var conditionMap: MutableMap<String, InterfaceChachableLambda<T, Boolean>> = mutableMapOf()
+    private var conditionMap: MutableMap<String, ((InterfaceInfo<T>) -> Boolean)> = mutableMapOf()
     private val clazz: KClass<T>
 
     fun add(
         condition: InterfaceInfo<T>.() -> Boolean,
         key: String = ANONYMOUS_KEY,
-        dependency: InterfaceDependency<T> = InterfaceDependency.all<T>()
     ) {
-        conditionMap[nextName(key, conditionMap.keys.toList())] = condition.toInterfaceChachableLambda(dependency)
+        conditionMap[nextName(key, conditionMap.keys.toList())] = { it: InterfaceInfo<T> -> condition(it) }
     }
 
     fun set(
         condition: InterfaceInfo<T>.() -> Boolean,
         key: String = ANONYMOUS_KEY,
-        dependency: InterfaceDependency<T> = InterfaceDependency.all<T>()
     ) {
-        conditionMap[key] = condition.toInterfaceChachableLambda(dependency)
+        conditionMap[key] = { it: InterfaceInfo<T> -> true }
     }
 
     fun resetConditions(excludingConditionKeys: List<String>) {
@@ -52,29 +49,29 @@ class ConditionMap<T : Context> {
             .forEach { conditionMap.remove(it) }
     }
 
-    val flattend by lazy { { info: InterfaceInfo<T> -> conditionMap.values.all { it.get(info) } } }
-    fun getMap(): Map<String, InterfaceChachableLambda<T, Boolean>> = conditionMap
-    fun copy(): ConditionMap<T> = ConditionMap(conditionMap, clazz)
+    val flattend by lazy { { info: InterfaceInfo<T> -> conditionMap.values.all { condition -> condition(info) } } }
+    fun getMap(): Map<String, ((InterfaceInfo<T>) -> Boolean)> = conditionMap
+    fun copy(): ConditionMap<T> = ConditionMap<T>(conditionMap, clazz)
 }
 
 class Condition<T : Context> {
-    var condition: (InterfaceInfo<T>) -> Boolean = { true }
+    var condition: ((InterfaceInfo<T>) -> Boolean) = { true }
 
     constructor(
-        condition: (InterfaceInfo<T>) -> Boolean
+        condition: ((InterfaceInfo<T>) -> Boolean)
     ) {
         this.condition = condition
     }
 
-    constructor(int: Slot, condition: (InterfaceInfo<T>) -> Boolean = { true }) {
+    constructor(int: Slot, condition: ((InterfaceInfo<T>) -> Boolean) = { true }) {
         this.condition = { it: InterfaceInfo<T> -> it.slot == int && condition(it) } and condition
     }
 
-    constructor(int: IntRange, condition: (InterfaceInfo<T>) -> Boolean = { true }) {
+    constructor(int: IntRange, condition: ((InterfaceInfo<T>) -> Boolean) = { true }) {
         this.condition = { it: InterfaceInfo<T> -> it.slot in int && condition(it) } and condition
     }
 
-    operator fun invoke(): (InterfaceInfo<T>) -> Boolean {
+    operator fun invoke(): ((InterfaceInfo<T>) -> Boolean) {
         return condition
     }
 }

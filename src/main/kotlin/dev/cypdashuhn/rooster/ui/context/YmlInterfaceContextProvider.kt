@@ -1,8 +1,6 @@
 package dev.cypdashuhn.rooster.ui.context
 
 import com.google.gson.Gson
-import dev.cypdashuhn.rooster.database.YmlOperations
-import dev.cypdashuhn.rooster.database.YmlShell
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
 import dev.cypdashuhn.rooster.util.uuid

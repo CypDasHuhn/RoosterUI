@@ -9,16 +9,6 @@ import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KMutableProperty1
 
 open class InterfaceItem<T : Context> {
-    var dependsOn: List<KMutableProperty1<T, *>>? = null
-
-    fun dependsOn(vararg dependsOn: KMutableProperty1<T, *>): InterfaceItem<T> {
-        return this.also { it.dependsOn = dependsOn.toList() }
-    }
-
-    fun dependLess(): InterfaceItem<T> {
-        return this.also { it.dependsOn = listOf() }
-    }
-
     companion object {
         const val anonymousKey = "anonymous"
     }
