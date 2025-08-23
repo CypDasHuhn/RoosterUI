@@ -1,13 +1,13 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content
 
-import dev.cypdashuhn.rooster.hasClicks
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.Slots
 import dev.cypdashuhn.rooster.ui.items.constructors.ContextModifierItem
-import dev.cypdashuhn.rooster.util.ClickType
-import dev.cypdashuhn.rooster.util.createItem
+import dev.cypdashuhn.rooster.common.util.ClickType
+import dev.cypdashuhn.rooster.common.util.createItem
+import dev.cypdashuhn.rooster.common.util.typeOf
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import kotlin.reflect.KClass
@@ -28,8 +28,8 @@ abstract class GraphInterface<ContextType : GraphInterface.GraphContext, DataTyp
         contextModifier = { clickInfo ->
             clickInfo.context.also { context ->
                 val y = context.position.second
-                var scrollAmount = if (clickInfo.event.hasClicks(ClickType.SHIFT_CLICK)) 5 else 1
-                if (clickInfo.event.hasClicks(ClickType.LEFT_CLICK)) scrollAmount *= -1
+                var scrollAmount = if (clickInfo.event.typeOf(ClickType.SHIFT_CLICK)) 5 else 1
+                if (clickInfo.event.typeOf(ClickType.LEFT_CLICK)) scrollAmount *= -1
                 context.position = context.position.first to y + scrollAmount
             }
         }
@@ -43,8 +43,8 @@ abstract class GraphInterface<ContextType : GraphInterface.GraphContext, DataTyp
         contextModifier = { clickInfo ->
             clickInfo.context.also { context ->
                 val x = context.position.first
-                var scrollAmount = if (clickInfo.event.hasClicks(ClickType.SHIFT_CLICK)) 5 else 1
-                if (clickInfo.event.hasClicks(ClickType.LEFT_CLICK)) scrollAmount *= -1
+                var scrollAmount = if (clickInfo.event.typeOf(ClickType.SHIFT_CLICK)) 5 else 1
+                if (clickInfo.event.typeOf(ClickType.LEFT_CLICK)) scrollAmount *= -1
                 context.position = x + scrollAmount to context.position.second
             }
         }

@@ -1,15 +1,16 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors
 
-import dev.cypdashuhn.rooster.hasClicks
-import dev.cypdashuhn.rooster.ui.RoosterOptions
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
 import dev.cypdashuhn.rooster.ui.interfaces.constructors.PageInterface.Page
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.Slots
 import dev.cypdashuhn.rooster.ui.items.constructors.ContextModifierItem
-import dev.cypdashuhn.rooster.util.ClickType
-import dev.cypdashuhn.rooster.util.createItem
+import dev.cypdashuhn.rooster.common.util.ClickType
+import dev.cypdashuhn.rooster.common.util.createItem
+import dev.cypdashuhn.rooster.common.util.typeOf
+import dev.cypdashuhn.rooster.ui.UISettings
+import dev.cypdashuhn.rooster.ui.UIWarnings
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -45,7 +46,7 @@ abstract class PageInterface<T : PageInterface.PageContext>(
         itemStack = createItem(Material.COMPASS, name = Component.empty()),
         contextModifier = { clickInfo ->
             clickInfo.context.also {
-                if (clickInfo.event.hasClicks(ClickType.LEFT_CLICK)) it.page += 1
+                if (clickInfo.event.typeOf(ClickType.LEFT_CLICK)) it.page += 1
                 else it.page -= 1
             }.also { if (it.page < 0) it.page = 0 }
         }
@@ -68,16 +69,16 @@ abstract class PageInterface<T : PageInterface.PageContext>(
 
         baseItems.addAll(
             initializePages().also { pages ->
-                if (pages.isEmpty()) {
-                    RoosterOptions.Warnings.INTERFACE_PAGES_EMPTY.warn()
+                if (pages.isEmpty()) { 
+                    UIWarnings.INTERFACE_PAGES_EMPTY.warn()
                 } else if (pages.none { it.page == 0 } && pages.any { it.page > 0 }) {
-                    RoosterOptions.Warnings.INTERFACE_PAGES_SKIPPED_FIRST.warn()
+                    UIWarnings.INTERFACE_PAGES_SKIPPED_FIRST.warn()
                 } else {
                     val overlappingPages = pages.groupBy { it.page }
                         .filter { it.value.size > 1 }
 
                     if (overlappingPages.isNotEmpty()) {
-                        RoosterOptions.Warnings.INTERFACE_PAGES_OVERLAP.warn(overlappingPages.mapValues { it.value.size })
+                        UIWarnings.INTERFACE_PAGES_OVERLAP.warn(overlappingPages.mapValues { it.value.size })
                     }
                 }
             }.map { page ->

@@ -1,8 +1,8 @@
-package dev.cypdashuhn.rooster.caching
+package dev.cypdashuhn.rooster.common
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import dev.cypdashuhn.rooster.util.uniqueKey
+import dev.cypdashuhn.rooster.common.util.uniqueKey
 import org.bukkit.command.CommandSender
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService

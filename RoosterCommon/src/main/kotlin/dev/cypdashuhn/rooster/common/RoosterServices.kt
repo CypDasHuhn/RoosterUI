@@ -1,4 +1,4 @@
-package dev.cypdashuhn.rooster.ui
+package dev.cypdashuhn.rooster.common
 
 import kotlin.collections.set
 import kotlin.properties.ReadOnlyProperty
@@ -8,7 +8,7 @@ interface RoosterService {
     fun targetClass(): KClass<out RoosterService>
 }
 
-object RoosterServices {
+class RoosterServices {
     private val services: MutableMap<KClass<out RoosterService>, RoosterService> = mutableMapOf()
 
     fun <T : RoosterService> set(instance: T): T {
@@ -19,6 +19,8 @@ object RoosterServices {
     fun <T : RoosterService> get(clazz: KClass<T>): T {
         return services[clazz] as? T ?: error("Service ${clazz.simpleName} not found.")
     }
+
+    fun <T : RoosterService> hasService(clazz: KClass<T>): Boolean = services.containsKey(clazz)
 
     inline fun <reified T : RoosterService> get(): T = get(T::class)
 

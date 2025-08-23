@@ -3,10 +3,9 @@ package dev.cypdashuhn.rooster.ui.items
 import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
-import dev.cypdashuhn.rooster.util.appendNumber
-import dev.cypdashuhn.rooster.util.infix_gate.and
+import dev.cypdashuhn.rooster.common.util.appendNumber
+import dev.cypdashuhn.rooster.common.util.infix_gate.and
 import org.bukkit.inventory.ItemStack
-import kotlin.reflect.KMutableProperty1
 
 open class InterfaceItem<T : Context> {
     companion object {

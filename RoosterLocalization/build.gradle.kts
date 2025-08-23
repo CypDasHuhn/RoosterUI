@@ -1,10 +1,8 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm")
 }
 
-group = "dev.cypdashuhn.rooster.ui"
+group = "dev.cypdashuhn.rooster.localization"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -20,10 +18,10 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
-    implementation("io.insert-koin:koin-core:3.4.3")
+    implementation("com.google.code.gson:gson:2.11.0")
+    implementation("net.kyori:adventure-api:4.17.0")
 
     implementation(project(":RoosterCommon"))
-    implementation(project(":RoosterLocalization"))
 }
 
 tasks.test {
@@ -31,8 +29,4 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
-}
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.compilerOptions {
-    freeCompilerArgs.set(listOf("-XXLanguage:+WhenGuards"))
 }

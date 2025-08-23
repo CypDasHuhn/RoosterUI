@@ -6,7 +6,7 @@ import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.emptyContext
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.constructors.PlaceholderItem
-import dev.cypdashuhn.rooster.util.createItem
+import dev.cypdashuhn.rooster.common.util.createItem
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit

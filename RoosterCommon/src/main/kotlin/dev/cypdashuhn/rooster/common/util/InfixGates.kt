@@ -1,6 +1,6 @@
-package dev.cypdashuhn.rooster.util.infix_gate
+package dev.cypdashuhn.rooster.common.util.infix_gate
 
-import dev.cypdashuhn.rooster.util.*
+import dev.cypdashuhn.rooster.common.util.*
 
 /** Returns true if both this and other are true. */
 infix fun <T> ((T) -> Boolean).and(other: (T) -> Boolean): (T) -> Boolean {

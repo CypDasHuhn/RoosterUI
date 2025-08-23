@@ -5,7 +5,7 @@ import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
 import dev.cypdashuhn.rooster.ui.items.Condition
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.ItemStackCreator
-import dev.cypdashuhn.rooster.util.infix_gate.and
+import dev.cypdashuhn.rooster.common.util.infix_gate.and
 import org.bukkit.inventory.ItemStack
 
 open class PlaceholderItem<T : Context> : InterfaceItem<T> {

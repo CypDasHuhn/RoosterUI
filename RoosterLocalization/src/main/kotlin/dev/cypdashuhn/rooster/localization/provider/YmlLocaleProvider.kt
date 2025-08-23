@@ -1,8 +1,8 @@
 package dev.cypdashuhn.rooster.localization.provider
 
-import dev.cypdashuhn.rooster.ui.context.YmlOperations
-import dev.cypdashuhn.rooster.ui.context.YmlShell
-import dev.cypdashuhn.rooster.util.uuid
+import dev.cypdashuhn.rooster.common.YmlOperations
+import dev.cypdashuhn.rooster.common.YmlShell
+import dev.cypdashuhn.rooster.common.util.uuid
 import org.bukkit.entity.Player
 import java.util.*
 

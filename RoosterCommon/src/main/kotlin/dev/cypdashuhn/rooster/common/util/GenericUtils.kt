@@ -1,4 +1,4 @@
-package dev.cypdashuhn.rooster.util
+package dev.cypdashuhn.rooster.common.util
 
 fun appendNumber(name: String): String {
     val regex = "\\d+$".toRegex()

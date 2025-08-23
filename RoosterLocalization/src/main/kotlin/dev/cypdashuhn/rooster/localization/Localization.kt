@@ -1,9 +1,10 @@
 package dev.cypdashuhn.rooster.localization
 
+import dev.cypdashuhn.rooster.localization.core.LocalizationSettings
+import dev.cypdashuhn.rooster.localization.core.LocalizationWarnings
+import dev.cypdashuhn.rooster.localization.core.RoosterLocalization.cache
+import dev.cypdashuhn.rooster.localization.core.RoosterLocalization.localeProvider
 import dev.cypdashuhn.rooster.localization.provider.Language
-import dev.cypdashuhn.rooster.ui.RoosterOptions
-import dev.cypdashuhn.rooster.ui.RoosterUI.cache
-import dev.cypdashuhn.rooster.ui.RoosterUI.localeProvider
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -20,8 +21,8 @@ object Localization {
         var message = cache.get("$language-$messageKey", null, {
             val resourcePath = "/locales/${language.lowercase()}.json"
             val inputStream = javaClass.getResourceAsStream(resourcePath)
-                ?: return@get RoosterOptions.Localization.DEFAULT_STRING.also {
-                    RoosterOptions.Warnings.LOCALIZATION_MISSING_LOCALE.warn(resourcePath)
+                ?: return@get LocalizationSettings.DEFAULT_STRING.also {
+                    LocalizationWarnings.LOCALIZATION_MISSING_LOCALE.warn(resourcePath)
                 }
 
             val localization = LocaleFileParser.parseLocalization(inputStream)
@@ -38,8 +39,8 @@ object Localization {
 
             if (roosterMessage != null) return@get roosterMessage
 
-            RoosterOptions.Warnings.LOCALIZATION_MISSING_LOCALE.warn(messageKey to language)
-            return@get RoosterOptions.Localization.DEFAULT_STRING
+            LocalizationWarnings.LOCALIZATION_MISSING_LOCALE.warn(messageKey to language)
+            return@get LocalizationSettings.DEFAULT_STRING
         }, 60, TimeUnit.MINUTES)
 
         for ((key, value) in replacements) {

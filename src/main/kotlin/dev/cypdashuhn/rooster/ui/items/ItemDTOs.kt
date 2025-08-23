@@ -3,13 +3,11 @@ package dev.cypdashuhn.rooster.ui.items
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
-import dev.cypdashuhn.rooster.util.createItem
-import dev.cypdashuhn.rooster.util.infix_gate.and
-import dev.cypdashuhn.rooster.util.nextName
+import dev.cypdashuhn.rooster.common.util.*
+import dev.cypdashuhn.rooster.common.util.infix_gate.and
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import java.util.function.Predicate
 import kotlin.reflect.KClass
 
 class ConditionMap<T : Context> {

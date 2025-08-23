@@ -1,6 +1,6 @@
 package dev.cypdashuhn.rooster.localization.provider
 
-import dev.cypdashuhn.rooster.ui.RoosterService
+import dev.cypdashuhn.rooster.common.RoosterService
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.translation.GlobalTranslator
 import net.kyori.adventure.translation.TranslationRegistry

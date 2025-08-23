@@ -1,6 +1,6 @@
 package dev.cypdashuhn.rooster.ui.context
 
-import dev.cypdashuhn.rooster.ui.RoosterService
+import dev.cypdashuhn.rooster.common.RoosterService
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
 import org.bukkit.entity.Player

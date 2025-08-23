@@ -4,7 +4,7 @@ import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
 import dev.cypdashuhn.rooster.ui.interfaces.constructors.NoContextInterface
-import dev.cypdashuhn.rooster.util.createItem
+import dev.cypdashuhn.rooster.common.util.createItem
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass

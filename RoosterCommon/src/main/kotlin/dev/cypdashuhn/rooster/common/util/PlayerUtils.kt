@@ -1,4 +1,4 @@
-package dev.cypdashuhn.rooster.util
+package dev.cypdashuhn.rooster.common.util
 
 import org.bukkit.Location
 import org.bukkit.command.BlockCommandSender
