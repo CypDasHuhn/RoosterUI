@@ -9,12 +9,12 @@ import org.bukkit.inventory.ItemStack
 
 open class InterfaceItem<T : Context> {
     companion object {
-        const val anonymousKey = "anonymous"
+        const val ANONYMOUS_KEY = "anonymous"
     }
 
     val conditionMap: MutableMap<String, (InterfaceInfo<T>) -> Boolean>
 
-    fun addCondition(condition: (InterfaceInfo<T>) -> Boolean, name: String = anonymousKey) {
+    fun addCondition(condition: (InterfaceInfo<T>) -> Boolean, name: String = ANONYMOUS_KEY) {
         val newName = if (conditionMap.contains(name)) appendNumber(name) else name
         conditionMap[newName] = condition
     }
@@ -30,7 +30,7 @@ open class InterfaceItem<T : Context> {
     fun setCondition(condition: (InterfaceInfo<T>) -> Boolean, name: String? = null) {
         if (name == null) {
             conditionMap.clear()
-            conditionMap[anonymousKey] = condition
+            conditionMap[ANONYMOUS_KEY] = condition
         } else {
             conditionMap[name] = condition
         }
@@ -38,7 +38,7 @@ open class InterfaceItem<T : Context> {
 
     /** Returns true if the condition was found, false if not. */
     fun overrideCondition(
-        name: String = anonymousKey,
+        name: String = ANONYMOUS_KEY,
         transformedCondition: ((InterfaceInfo<T>) -> Boolean) -> (InterfaceInfo<T>) -> Boolean
     ): Boolean {
         return if (conditionMap.contains(name)) {
@@ -71,7 +71,7 @@ open class InterfaceItem<T : Context> {
 
     constructor(
         condition: (InterfaceInfo<T>) -> Boolean,
-        conditionKey: String = anonymousKey,
+        conditionKey: String = ANONYMOUS_KEY,
         itemStackCreator: (InterfaceInfo<T>) -> ItemStack,
         action: (ClickInfo<T>) -> Unit = {},
         priority: ((InterfaceInfo<T>) -> Int)? = null
@@ -85,7 +85,7 @@ open class InterfaceItem<T : Context> {
 
     constructor(
         condition: (InterfaceInfo<T>) -> Boolean,
-        conditionKey: String = anonymousKey,
+        conditionKey: String = ANONYMOUS_KEY,
         itemStack: ItemStack,
         action: (ClickInfo<T>) -> Unit = {},
         priority: ((InterfaceInfo<T>) -> Int)? = null
@@ -100,7 +100,7 @@ open class InterfaceItem<T : Context> {
     constructor(
         slots: Slots,
         condition: (InterfaceInfo<T>) -> Boolean = { true },
-        conditionKey: String = anonymousKey,
+        conditionKey: String = ANONYMOUS_KEY,
         itemStackCreator: (InterfaceInfo<T>) -> ItemStack,
         action: (ClickInfo<T>) -> Unit = {},
         priority: ((InterfaceInfo<T>) -> Int)? = null
@@ -115,7 +115,7 @@ open class InterfaceItem<T : Context> {
     constructor(
         slots: Slots,
         condition: (InterfaceInfo<T>) -> Boolean = { true },
-        conditionKey: String = anonymousKey,
+        conditionKey: String = ANONYMOUS_KEY,
         itemStack: ItemStack,
         action: (ClickInfo<T>) -> Unit = {},
         priority: ((InterfaceInfo<T>) -> Int)? = null

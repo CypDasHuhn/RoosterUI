@@ -28,7 +28,7 @@ object RoosterUI {
 
     fun init(
         plugin: JavaPlugin,
-        interfaces: List<RoosterInterface<*>>,
+        interfaces: List<RoosterInterface<*>> = emptyList(),
         services: RoosterServices? = null,
         cache: RoosterCache<String, Any>? = null
     ) {

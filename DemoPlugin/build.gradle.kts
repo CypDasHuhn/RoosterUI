@@ -1,10 +1,9 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm")
+    id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
-group = "dev.cypdashuhn.rooster.ui"
+group = "dev.cypdashuhn.rooster.ui.demo"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -20,8 +19,7 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
-    implementation(project(":RoosterCommon"))
-    implementation(project(":RoosterLocalization"))
+    implementation(project(":"))
 }
 
 tasks.test {
@@ -29,8 +27,4 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
-}
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.compilerOptions {
-    freeCompilerArgs.set(listOf("-XXLanguage:+WhenGuards"))
 }

@@ -4,3 +4,4 @@ plugins {
 rootProject.name = "RoosterUI"
 include("RoosterCommon")
 include("RoosterLocalization")
+include("DemoPlugin")

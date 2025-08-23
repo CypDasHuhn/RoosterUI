@@ -9,6 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/DemoPlugin" />
             <option value="$PROJECT_DIR$/RoosterCommon" />
             <option value="$PROJECT_DIR$/RoosterLocalization" />
           </set>
