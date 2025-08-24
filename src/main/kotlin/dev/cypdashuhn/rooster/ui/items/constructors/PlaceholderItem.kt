@@ -3,7 +3,6 @@ package dev.cypdashuhn.rooster.ui.items.constructors
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
 import dev.cypdashuhn.rooster.ui.items.Condition
-import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.ItemStackCreator
 import dev.cypdashuhn.rooster.common.util.infix_gate.and
 import org.bukkit.inventory.ItemStack

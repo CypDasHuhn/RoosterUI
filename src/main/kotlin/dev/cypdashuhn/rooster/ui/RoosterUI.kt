@@ -2,13 +2,16 @@ package dev.cypdashuhn.rooster.ui
 
 import com.google.common.cache.CacheBuilder
 import dev.cypdashuhn.rooster.common.RoosterCache
+import dev.cypdashuhn.rooster.common.RoosterCommon
 import dev.cypdashuhn.rooster.common.RoosterServices
 import dev.cypdashuhn.rooster.localization.core.RoosterLocalization
 import dev.cypdashuhn.rooster.localization.provider.LocaleProvider
 import dev.cypdashuhn.rooster.localization.provider.YmlLocaleProvider
 import dev.cypdashuhn.rooster.ui.context.InterfaceContextProvider
 import dev.cypdashuhn.rooster.ui.context.YmlInterfaceContextProvider
+import dev.cypdashuhn.rooster.ui.interfaces.InterfaceListener
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -20,7 +23,7 @@ object RoosterUI {
     internal val pluginFolder by lazy { plugin.dataFolder }
     internal var logger = Logger.getLogger("RoosterUI")
     internal val interfaces: MutableList<RoosterInterface<*>> = mutableListOf()
-    internal lateinit var services: RoosterServices
+    internal var services: RoosterServices = RoosterServices()
 
     internal lateinit var cache: RoosterCache<String, Any>
 
@@ -34,13 +37,17 @@ object RoosterUI {
     ) {
         this.plugin = plugin
         this.interfaces.addAll(interfaces)
-        this.services = services ?: RoosterServices()
+        if (services != null) this.services = services
 
         if (!this.services.hasService(InterfaceContextProvider::class)) {
             this.services.set<InterfaceContextProvider>(YmlInterfaceContextProvider())
         }
         this.cache = cache ?: RoosterCache(CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES))
 
+        val pluginManager = Bukkit.getPluginManager()
+        pluginManager.registerEvents(InterfaceListener, plugin)
+
+        RoosterCommon.init(plugin)
         RoosterLocalization.init(plugin = plugin, services = services, cache = cache)
     }
 }

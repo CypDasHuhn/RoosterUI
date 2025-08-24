@@ -24,4 +24,7 @@ class Slots {
     companion object {
         fun all() = Slots()
     }
+
+    fun targetsSlot(slot: Int) = slots.contains(slot) || all
 }
+fun Slots?.targetsSlot(slot: Int) = this?.targetsSlot(slot) ?: false

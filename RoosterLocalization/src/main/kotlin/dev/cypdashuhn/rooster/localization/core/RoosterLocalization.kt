@@ -2,6 +2,7 @@ package dev.cypdashuhn.rooster.localization.core
 
 import com.google.common.cache.CacheBuilder
 import dev.cypdashuhn.rooster.common.RoosterCache
+import dev.cypdashuhn.rooster.common.RoosterCommon
 import dev.cypdashuhn.rooster.common.RoosterServices
 import dev.cypdashuhn.rooster.localization.provider.LocaleProvider
 import dev.cypdashuhn.rooster.localization.provider.YmlLocaleProvider
@@ -14,7 +15,7 @@ object RoosterLocalization {
     internal lateinit var plugin: JavaPlugin
     internal val logger: Logger = Logger.getLogger("RoosterLocalization")
     lateinit var cache: RoosterCache<String, Any>
-    lateinit var services: RoosterServices
+    internal var services: RoosterServices = RoosterServices()
     internal val localeProvider by services.delegate<LocaleProvider>()
 
     fun init(
@@ -23,7 +24,7 @@ object RoosterLocalization {
         cache: RoosterCache<String, Any>? = null
     ) {
         this.plugin = plugin
-        this.services = services ?: RoosterServices()
+        if (services != null) this.services = services
         if (!this.services.hasService(LocaleProvider::class)) {
             this.services.set<LocaleProvider>(YmlLocaleProvider(mapOf("en_US" to Locale.ENGLISH), "en_US"))
         }
@@ -31,6 +32,6 @@ object RoosterLocalization {
             CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES)
         )
 
-
+        RoosterCommon.init(plugin)
     }
 }

@@ -2,7 +2,6 @@ package dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content
 
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
-import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.Slots
 import dev.cypdashuhn.rooster.ui.items.constructors.ContextModifierItem
 import dev.cypdashuhn.rooster.common.util.ClickType

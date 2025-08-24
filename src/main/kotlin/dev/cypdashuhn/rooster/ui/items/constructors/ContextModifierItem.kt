@@ -3,7 +3,6 @@ package dev.cypdashuhn.rooster.ui.items.constructors
 import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
-import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.Slots
 import org.bukkit.inventory.ItemStack
 

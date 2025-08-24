@@ -2,12 +2,12 @@ package dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content
 
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
-import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.Slots
 import dev.cypdashuhn.rooster.ui.items.constructors.ContextModifierItem
 import dev.cypdashuhn.rooster.common.util.ClickType
 import dev.cypdashuhn.rooster.common.util.createItem
 import dev.cypdashuhn.rooster.common.util.typeOf
+import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import kotlin.reflect.KClass
@@ -30,25 +30,21 @@ abstract class ScrollInterface<ContextType : ScrollInterface.ScrollContext, Data
     private val rowSize: Int
         get() = if (scrollDirection == ScrollDirection.LEFT_RIGHT) contentXWidth else contentYWidth
 
+    private val scroller = item()
+        .atSlot(bottomRow + 8)
+        .displayAs(createItem(Material.COMPASS))
+        .modifyContext {
+            var scrollAmount = if (event.typeOf(ClickType.SHIFT_CLICK)) 5 else 1
+            if (event.typeOf(ClickType.LEFT_CLICK)) scrollAmount *= -1
 
-    private fun scroller() = ContextModifierItem<ContextType>(
-        slots = Slots(bottomRow + 8),
-        itemStack = createItem(Material.COMPASS),
-        contextModifier = { clickInfo ->
-            clickInfo.context.also { context ->
-                var scrollAmount = if (clickInfo.event.typeOf(ClickType.SHIFT_CLICK)) 5 else 1
-                if (clickInfo.event.typeOf(ClickType.LEFT_CLICK)) scrollAmount *= -1
-
-                context.position += scrollAmount
-                if (context.position < 0) context.position = 0
-            }
+            context.position += scrollAmount
+            if (context.position < 0) context.position = 0
         }
-    )
 
     open fun modifiedScroller(item: ContextModifierItem<ContextType>): ContextModifierItem<ContextType> = item
 
     final override fun getFrameItems(): List<InterfaceItem<ContextType>> = listOf(
-        modifiedScroller(scroller())
+        modifiedScroller(scroller)
     )
 
     final override fun slotToId(slot: Slot, context: ContextType, player: Player): Int? {

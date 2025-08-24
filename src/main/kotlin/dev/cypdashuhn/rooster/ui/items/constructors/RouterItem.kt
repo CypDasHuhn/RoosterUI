@@ -5,7 +5,6 @@ import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
 import dev.cypdashuhn.rooster.ui.items.Condition
-import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.ItemStackCreator
 import org.bukkit.inventory.ItemStack
 

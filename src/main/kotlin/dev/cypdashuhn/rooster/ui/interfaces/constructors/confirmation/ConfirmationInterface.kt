@@ -4,7 +4,6 @@ import dev.cypdashuhn.rooster.localization.t
 import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.emptyContext
-import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import dev.cypdashuhn.rooster.ui.items.constructors.PlaceholderItem
 import dev.cypdashuhn.rooster.common.util.createItem
 import net.kyori.adventure.text.Component

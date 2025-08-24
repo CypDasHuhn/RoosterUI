@@ -3,31 +3,37 @@ package dev.cypdashuhn.rooster.ui.interfaces.constructors
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
 import dev.cypdashuhn.rooster.ui.interfaces.constructors.PageInterface.Page
-import dev.cypdashuhn.rooster.ui.items.InterfaceItem
-import dev.cypdashuhn.rooster.ui.items.Slots
-import dev.cypdashuhn.rooster.ui.items.constructors.ContextModifierItem
 import dev.cypdashuhn.rooster.common.util.ClickType
 import dev.cypdashuhn.rooster.common.util.createItem
 import dev.cypdashuhn.rooster.common.util.typeOf
-import dev.cypdashuhn.rooster.ui.UISettings
 import dev.cypdashuhn.rooster.ui.UIWarnings
+import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterfaceOptions
+import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import kotlin.reflect.KClass
 
+// TODO: Handle different Page Turners
+class PageInterfaceOptions <T : Context> : RoosterInterfaceOptions<T>() {
+    val pageTurnerModifier: (InterfaceItem<T>) -> InterfaceItem<T> = { it }
+    /** Value between 1-5 (last row is bottom bar) */
+    val contentRowAmount: Int = 5
+}
+
 /** Generally unfinished in every aspect. just ignore! */
 @Suppress("unused")
 abstract class PageInterface<T : PageInterface.PageContext>(
-    override val interfaceName: String,
-    override val contextClass: KClass<T>,
-    /** Value between 1-5 (last row is bottom bar) */
-    private val contentRowAmount: Int = 5
-) : RoosterInterface<T>(interfaceName, contextClass) {
+    override var interfaceName: String,
+    override var contextClass: KClass<T>,
+    optionsBuilder: PageInterfaceOptions<T>.() -> Unit = { }
+) : RoosterInterface<T>(interfaceName, contextClass, PageInterfaceOptions<T>().apply(optionsBuilder)) {
+    val pageOptions = super.options as PageInterfaceOptions<T>
     companion object {
-        const val PAGE_CONDITION_KEY = "page"
+        const val PAGE_CONDITION_KEY = "rooster_page"
     }
 
     open class PageContext(
@@ -37,67 +43,59 @@ abstract class PageInterface<T : PageInterface.PageContext>(
     data class Page<T : Context>(val page: Int, val items: List<InterfaceItem<T>>)
 
     val bottomBar
-        get() = contentRowAmount * 9
+        get() = pageOptions.contentRowAmount * 9
 
-    abstract fun initializePages(): List<Page<T>>
+    abstract fun getPages(): List<Page<T>>
 
-    val pageTurner = ContextModifierItem<T>(
-        slots = Slots(bottomBar + 8),
-        itemStack = createItem(Material.COMPASS, name = Component.empty()),
-        contextModifier = { clickInfo ->
-            clickInfo.context.also {
-                if (clickInfo.event.typeOf(ClickType.LEFT_CLICK)) it.page += 1
-                else it.page -= 1
-            }.also { if (it.page < 0) it.page = 0 }
-        }
-    )
+    val pageTurner = item().atSlot(bottomBar + 8).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
+        if (event.typeOf(ClickType.LEFT_CLICK)) context.page += 1
+        else context.page -= 1
+        if (context.page < 0) context.page = 0
+    }
 
-    val forwardPageTurner = pageTurner.changeContextModifierAction(contextModifier = { clickInfo ->
-        clickInfo.context.also { it.page += 1 }
-    }).also { it.slots = Slots(bottomBar + 7) }
-
-    val backwardsPageTurned = pageTurner.changeContextModifierAction(contextModifier = { clickInfo ->
-        clickInfo.context.also { it.page -= 1 }
-    })
-
-    open fun customizePageTurner(item: InterfaceItem<T>): InterfaceItem<T> {
-        return item
+    val forwardPageTurner = item().atSlot(bottomBar + 7).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
+        context.page += 1
+        if (context.page < 0) context.page = 0
+    }
+    val backwardsPageTurner = item().atSlot(bottomBar + 6).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
+        context.page -= 1
+        if (context.page < 0) context.page = 0
     }
 
     override fun getInterfaceItems(): List<InterfaceItem<T>> {
         val baseItems = mutableListOf<InterfaceItem<T>>()
 
-        baseItems.addAll(
-            initializePages().also { pages ->
-                if (pages.isEmpty()) { 
-                    UIWarnings.INTERFACE_PAGES_EMPTY.warn()
-                } else if (pages.none { it.page == 0 } && pages.any { it.page > 0 }) {
-                    UIWarnings.INTERFACE_PAGES_SKIPPED_FIRST.warn()
-                } else {
-                    val overlappingPages = pages.groupBy { it.page }
-                        .filter { it.value.size > 1 }
+        val pages = getPages()
+        if (pages.isEmpty()) UIWarnings.INTERFACE_PAGES_EMPTY.warn()
+        else if (pages.none { it.page == 0 } && pages.any { it.page > 0 }) UIWarnings.INTERFACE_PAGES_SKIPPED_FIRST.warn()
+        else {
+            val overlappingPages = pages.groupBy { it.page }
+                .filter { it.value.size > 1 }
 
-                    if (overlappingPages.isNotEmpty()) {
-                        UIWarnings.INTERFACE_PAGES_OVERLAP.warn(overlappingPages.mapValues { it.value.size })
-                    }
-                }
-            }.map { page ->
-                page.items.onEach { item ->
-                    item.addCondition({ it.context.page == page.page }, PAGE_CONDITION_KEY)
-                }
-            }.flatten()
-        )
+            if (overlappingPages.isNotEmpty()) UIWarnings.INTERFACE_PAGES_OVERLAP.warn(overlappingPages.mapValues { it.value.size })
+        }
 
-        baseItems.add(customizePageTurner(pageTurner))
+        baseItems.addAll(pages.map { page ->
+            page.items.onEach { item ->
+                item.condition.add({ context.page == page.page }, PAGE_CONDITION_KEY)
+            }
+        }.flatten())
+
+        baseItems.add(pageOptions.pageTurnerModifier(pageTurner))
 
         return baseItems
     }
 
     override fun getInventory(player: Player, context: T): Inventory {
-        return Bukkit.createInventory(player, (contentRowAmount + 1) * 9, getInventoryName(player, context))
+        if (pageOptions.contentRowAmount !in 1..5) {
+            throw IllegalArgumentException("Content row amount must be between 1 and 5")
+        }
+        return Bukkit.createInventory(player, (pageOptions.contentRowAmount + 1) * 9, getInventoryName(player, context))
     }
 
-    abstract fun getInventoryName(player: Player, context: T): String
+    open fun getInventoryName(player: Player, context: T): TextComponent {
+        return Component.text("$interfaceName #${context.page + 1}")
+    }
 
     fun pages(block: PageListBuilder<T>.() -> Unit): List<Page<T>> {
         val builder = PageListBuilder<T>()
