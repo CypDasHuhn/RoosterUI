@@ -1,7 +1,7 @@
 package dev.cypdashuhn.rooster.ui.interfaces
 
-import dev.cypdashuhn.rooster.*
-import dev.cypdashuhn.rooster.core.Rooster
+import dev.cypdashuhn.rooster.ui.RoosterUICore
+import dev.cypdashuhn.rooster.ui.RoosterUICore.interfaceContextProvider
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -38,7 +38,7 @@ object InterfaceManager {
      * of the interface ([context]).
      */
     fun <T : Context> openTargetInterface(player: Player, targetInterface: RoosterInterface<T>, context: T): Inventory {
-        Rooster.cache.put(CHANGES_INTERFACE_KEY, player, true)
+        RoosterUICore.cache.put(CHANGES_INTERFACE_KEY, player, true)
 
         playerInterfaceMap[player] = targetInterface.interfaceName
 
@@ -46,7 +46,7 @@ object InterfaceManager {
             targetInterface.getInventory(player, context)
                 .fillInventory(targetInterface.items, context, player)
 
-        Rooster.interfaceContextProvider.updateContext(player, targetInterface, context)
+        interfaceContextProvider.updateContext(player, targetInterface, context)
 
         /*
         TODO: Look out how to properly handle this with a decentralized Simulator now
@@ -102,7 +102,7 @@ object InterfaceManager {
         val interfaceName = playerInterfaceMap[player] ?: return null
         if (interfaceName.isEmpty()) return null
 
-        return Rooster.registered.interfaces
+        return RoosterUICore.interfaces
             .firstOrNull { currentInterface -> currentInterface.interfaceName == interfaceName }
     }
 

@@ -1,7 +1,7 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors
 
-import dev.cypdashuhn.rooster.core.config.RoosterOptions
-import dev.cypdashuhn.rooster.listeners.usable_item.hasClicks
+import dev.cypdashuhn.rooster.ui.RoosterOptions
+import dev.cypdashuhn.rooster.ui.hasClicks
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
 import dev.cypdashuhn.rooster.ui.interfaces.constructors.PageInterface.Page

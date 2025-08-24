@@ -1,6 +1,5 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors.confirmation
 
-import dev.cypdashuhn.rooster.localization.t
 import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.emptyContext
@@ -27,7 +26,7 @@ abstract class ConfirmationInterface<T : Context>(
 
     open fun getInventoryName(player: Player, context: T): Component {
         return Component
-            .text("# ${t("confirm", player)} #")
+            .text("# CONFIRM #")
             .color(TextColor.color(200, 0, 0))
     }
 

@@ -1,6 +1,6 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content
 
-import dev.cypdashuhn.rooster.listeners.usable_item.hasClicks
+import dev.cypdashuhn.rooster.ui.hasClicks
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
