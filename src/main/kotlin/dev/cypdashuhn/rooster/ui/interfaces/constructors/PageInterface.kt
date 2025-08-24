@@ -1,13 +1,12 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors
 
-import dev.cypdashuhn.rooster.ui.interfaces.Context
-import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
-import dev.cypdashuhn.rooster.ui.interfaces.constructors.PageInterface.Page
 import dev.cypdashuhn.rooster.common.util.ClickType
 import dev.cypdashuhn.rooster.common.util.createItem
 import dev.cypdashuhn.rooster.common.util.typeOf
 import dev.cypdashuhn.rooster.ui.UIWarnings
-import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterfaceOptions
+import dev.cypdashuhn.rooster.ui.interfaces.Context
+import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
+import dev.cypdashuhn.rooster.ui.interfaces.constructors.PageInterface.Page
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -17,21 +16,23 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import kotlin.reflect.KClass
 
-// TODO: Handle different Page Turners
-class PageInterfaceOptions <T : Context> : RoosterInterfaceOptions<T>() {
-    val pageTurnerModifier: (InterfaceItem<T>) -> InterfaceItem<T> = { it }
-    /** Value between 1-5 (last row is bottom bar) */
-    val contentRowAmount: Int = 5
-}
-
 /** Generally unfinished in every aspect. just ignore! */
 @Suppress("unused")
 abstract class PageInterface<T : PageInterface.PageContext>(
     override var interfaceName: String,
     override var contextClass: KClass<T>,
-    optionsBuilder: PageInterfaceOptions<T>.() -> Unit = { }
-) : RoosterInterface<T>(interfaceName, contextClass, PageInterfaceOptions<T>().apply(optionsBuilder)) {
+    pageOptions: PageInterfaceOptions<T> = PageInterfaceOptions<T>()
+) : RoosterInterface<T>(interfaceName, contextClass, pageOptions) {
+    // TODO: Handle different Page Turners
+    open class PageInterfaceOptions<T : Context> : RoosterInterfaceOptions<T>() {
+        var pageTurnerModifier: (InterfaceItem<T>) -> InterfaceItem<T> = { it }
+
+        /** Value between 1-5 (last row is bottom bar) */
+        var contentRowAmount: Int = 5
+    }
+
     val pageOptions = super.options as PageInterfaceOptions<T>
+
     companion object {
         const val PAGE_CONDITION_KEY = "rooster_page"
     }
@@ -47,20 +48,23 @@ abstract class PageInterface<T : PageInterface.PageContext>(
 
     abstract fun getPages(): List<Page<T>>
 
-    val pageTurner = item().atSlot(bottomBar + 8).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
-        if (event.typeOf(ClickType.LEFT_CLICK)) context.page += 1
-        else context.page -= 1
-        if (context.page < 0) context.page = 0
-    }
+    val pageTurner =
+        item().atSlot(bottomBar + 8).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
+            if (event.typeOf(ClickType.LEFT_CLICK)) context.page += 1
+            else context.page -= 1
+            if (context.page < 0) context.page = 0
+        }
 
-    val forwardPageTurner = item().atSlot(bottomBar + 7).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
-        context.page += 1
-        if (context.page < 0) context.page = 0
-    }
-    val backwardsPageTurner = item().atSlot(bottomBar + 6).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
-        context.page -= 1
-        if (context.page < 0) context.page = 0
-    }
+    val forwardPageTurner =
+        item().atSlot(bottomBar + 7).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
+            context.page += 1
+            if (context.page < 0) context.page = 0
+        }
+    val backwardsPageTurner =
+        item().atSlot(bottomBar + 6).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
+            context.page -= 1
+            if (context.page < 0) context.page = 0
+        }
 
     override fun getInterfaceItems(): List<InterfaceItem<T>> {
         val baseItems = mutableListOf<InterfaceItem<T>>()

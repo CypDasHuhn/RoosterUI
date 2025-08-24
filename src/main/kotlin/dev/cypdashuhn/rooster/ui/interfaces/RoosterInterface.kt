@@ -9,15 +9,13 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import kotlin.reflect.KClass
 
-open class RoosterInterfaceOptions<T : Context>() {
-    // Click behaviour
-    val cancelEvent: (ClickInfo<T>) -> Boolean = { true }
-    val ignorePlayerInventory: Boolean = true
-    val ignoreEmptySlots: Boolean = true
 
-    // Inventory-Creator
-    val inventorySize: Int = 9*6
-    val inventoryTitle: String? = null
+inline fun <T : Context, reified E : RoosterInterface.RoosterInterfaceOptions<T>> options(
+    block: E.() -> Unit
+): E {
+    val instance = E::class.java.getDeclaredConstructor().newInstance()
+    instance.block()
+    return instance
 }
 
 /**
@@ -25,31 +23,20 @@ open class RoosterInterfaceOptions<T : Context>() {
  * ingredient is [getInterfaceItems], which get resolved dynamically. The
  * field [interfaceName] is the key connected to the particular Interface.
  */
-abstract class RoosterInterface<T : Context>{
-    open lateinit var interfaceName: String
-        internal set
-    open lateinit var contextClass: KClass<T>
-        internal set
-    val options: RoosterInterfaceOptions<T>
+abstract class RoosterInterface<T : Context>(
+    open val interfaceName: String,
+    open val contextClass: KClass<T>,
+    val options: RoosterInterfaceOptions<T> = options { }
+) {
+    open class RoosterInterfaceOptions<T : Context>() {
+        // Click behaviour
+        var cancelEvent: (ClickInfo<T>) -> Boolean = { true }
+        var ignorePlayerInventory: Boolean = true
+        var ignoreEmptySlots: Boolean = true
 
-    constructor(
-        interfaceName: String,
-        contextClass: KClass<T>,
-        settingsBuilder: (RoosterInterfaceOptions<T>) -> Unit = { }
-    ) {
-       this.interfaceName = interfaceName
-       this.contextClass = contextClass
-       options = RoosterInterfaceOptions<T>().also { settingsBuilder(it) }
-    }
-
-    constructor(
-        interfaceName: String,
-        contextClass: KClass<T>,
-        settings: RoosterInterfaceOptions<T>
-    ) {
-        this.interfaceName = interfaceName
-        this.contextClass = contextClass
-        this.options = settings
+        // Inventory-Creator
+        var inventorySize: Int = 9 * 6
+        var inventoryTitle: String? = null
     }
 
     val items by lazy { getInterfaceItems() }
@@ -64,18 +51,21 @@ abstract class RoosterInterface<T : Context>{
     }
 
     abstract fun getInterfaceItems(): List<InterfaceItem<T>>
+    abstract fun defaultContext(player: Player): T
+
+    open fun onClose(player: Player, context: T, event: InventoryCloseEvent) {}
+
     internal fun forEachVisibleItem(info: InterfaceInfo<T>, action: (InterfaceItem<T>) -> Unit) {
         items
             .filter { it.check(info) }
             .sortedBy { it.priority(info) }
             .forEach(action)
     }
-    abstract fun defaultContext(player: Player): T
-    open fun onClose(player: Player, context: T, event: InventoryCloseEvent) { }
 
     fun openInventory(player: Player): Inventory {
         return openInventory(player, getCurrentContext(player) ?: defaultContext(player))
     }
+
     fun openInventory(player: Player, context: T): Inventory {
         return InterfaceManager.openTargetInterface(player, this, context)
     }

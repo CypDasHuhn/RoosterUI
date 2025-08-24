@@ -1,22 +1,25 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content
 
 import dev.cypdashuhn.rooster.ui.interfaces.*
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes.player
+import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 
-class IndexedContentOptions<T : Context> : RoosterInterfaceOptions<T>() {
-    val contentArea: Pair<Pair<Int, Int>, Pair<Int, Int>> = (0 to 0) to (8 to 5)
-}
 
 abstract class IndexedContentInterface<ContextType : Context, IdType : Any, DataType : Any>(
-    override var interfaceName: String,
-    override var contextClass: KClass<ContextType>,
-    indexedContentOptionsBuilder: IndexedContentOptions<ContextType>.() -> Unit = { }
-) : RoosterInterface<ContextType>(interfaceName, contextClass, IndexedContentOptions<ContextType>().apply(indexedContentOptionsBuilder)) {
+    interfaceName: InterfaceName,
+    contextClass: KClass<ContextType>,
+    indexedContentOptions: IndexedContentOptions<ContextType> = IndexedContentOptions()
+) : RoosterInterface<ContextType>(interfaceName, contextClass, indexedContentOptions) {
+    open class IndexedContentOptions<T : Context> : RoosterInterfaceOptions<T>() {
+        var contentArea: Pair<Pair<Int, Int>, Pair<Int, Int>> = (0 to 0) to (8 to 5)
+
+        var modifyContentItem: InterfaceItem<T>.() -> InterfaceItem<T> = { this }
+        var modifyClickInArea: InterfaceItem<T>.() -> InterfaceItem<T> = { this }
+    }
+
     val indexedContentOptions = (super.options as IndexedContentOptions<ContextType>).also {
         require(
             it.contentArea.first.first in 0..8 && it.contentArea.first.second in 0..5 &&
@@ -50,7 +53,7 @@ abstract class IndexedContentInterface<ContextType : Context, IdType : Any, Data
         }
     }
 
-    private fun contentItem_() = item()
+    private val contentItem = item()
         .usedWhen {
             if (offset(slot) != null) return@usedWhen false
             val data = dataFromPosition(slot, context, player)
@@ -58,54 +61,30 @@ abstract class IndexedContentInterface<ContextType : Context, IdType : Any, Data
         }
         .displayAs {
             val data = dataFromPosition(slot, context, player)!!
-            contentCreator(data, context).first(this)
+            contentDisplay(data, context).invoke(this)
         }
         .onClick {
             val data = dataFromPosition(click.slot, context, click.player)!!
-            contentCreator(data, context).second(this)
+            contentClick(data, context).invoke(this)
         }
-    private fun contentItem() = InterfaceItem<ContextType>(
-        condition = {
-            if (offset(it.slot) == null) return@InterfaceItem false
 
-            val data = dataFromPosition(it.slot, it.context, it.player)
-
-            return@InterfaceItem data != null
-        },
-        itemStackCreator = {
-            val data = dataFromPosition(it.slot, it.context, it.player)!!
-            return@InterfaceItem contentCreator(data, it.context).first(it)
-        },
-        action = {
-            val data = dataFromPosition(it.click.slot, it.context, it.click.player)!!
-            contentCreator(data, it.context).second(it)
-        }
-    )
-
-    private fun clickInArea() = InterfaceItem<ContextType>(
-        condition = {
-            if (offset(it.slot) != null) return@InterfaceItem false
-            val dataExists = dataFromPosition(it.slot, it.context, it.player) != null
+    private val clickInArea = item()
+        .usedWhen {
+            if (offset(slot) != null) return@usedWhen false
+            val dataExists = dataFromPosition(slot, context, player) != null
             !dataExists
-        },
-        itemStackCreator = { ItemStack(Material.AIR) },
-        action = {},
-        priority = { -1 }
-    )
+        }
+        .displayAs(ItemStack(Material.AIR))
+        .priority(-1)
+        .onClick { }
 
-    open fun modifiedContentItem(item: InterfaceItem<ContextType>): InterfaceItem<ContextType> = item
-    open fun modifiedClickInArea(item: InterfaceItem<ContextType>): InterfaceItem<ContextType> = item
+    abstract fun contentDisplay(data: DataType, context: ContextType): InterfaceInfo<ContextType>.() -> ItemStack
+    abstract fun contentClick(data: DataType, context: ContextType): ClickInfo<ContextType>.() -> Unit
 
-    abstract fun contentCreator(
-        data: DataType,
-        context: ContextType
-    ): Pair<(InterfaceInfo<ContextType>) -> ItemStack, (ClickInfo<ContextType>) -> Unit>
-
-    abstract override fun getInventory(player: Player, context: ContextType): Inventory
     final override fun getInterfaceItems(): List<InterfaceItem<ContextType>> {
         val list = mutableListOf(
-            modifiedContentItem(contentItem()),
-            modifiedClickInArea(clickInArea())
+            indexedContentOptions.modifyContentItem(contentItem),
+            indexedContentOptions.modifyClickInArea(clickInArea)
         )
 
         list.addAll(getFrameItems())
@@ -115,8 +94,7 @@ abstract class IndexedContentInterface<ContextType : Context, IdType : Any, Data
     }
 
     abstract fun getFrameItems(): List<InterfaceItem<ContextType>>
-    abstract fun getOtherItems(): List<InterfaceItem<ContextType>>
-    abstract override fun defaultContext(player: Player): ContextType
+    open fun getOtherItems(): List<InterfaceItem<ContextType>> = emptyList()
 
     abstract fun slotToId(slot: Slot, context: ContextType, player: Player): IdType?
     abstract fun contentProvider(id: IdType, context: ContextType): DataType?

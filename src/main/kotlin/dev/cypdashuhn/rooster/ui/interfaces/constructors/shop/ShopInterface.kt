@@ -1,4 +1,4 @@
-package dev.cypdashuhn.rooster.ui.shop
+package dev.cypdashuhn.rooster.ui.interfaces.constructors.shop
 
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo

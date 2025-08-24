@@ -1,5 +1,7 @@
 package dev.cypdashuhn.rooster.common.util
 
+import net.kyori.adventure.text.Component
+
 fun appendNumber(name: String): String {
     val regex = "\\d+$".toRegex()
     return if (regex.containsMatchIn(name)) {
@@ -16,3 +18,5 @@ fun nextName(name: String, list: List<String>): String {
         else -> name
     }
 }
+
+fun String.toComponent() = Component.text(this)
