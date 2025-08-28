@@ -26,15 +26,17 @@ abstract class BaseConfirmationInterface<T : Context>(
         var modifyCancelItem: InterfaceItem<T>.() -> InterfaceItem<T> = { this }
     }
 
-    private val confirmationItem = item()
-        .atSlot(8)
-        .displayAs(createItem(Material.GREEN_STAINED_GLASS_PANE, name = Component.text(t("confirm"))))
-        .onClick(onConfirm)
+    private val confirmationItem
+        get() = item()
+            .atSlot(8)
+            .displayAs(createItem(Material.GREEN_STAINED_GLASS_PANE, name = Component.text(t("confirm"))))
+            .onClick(onConfirm)
 
-    private val cancelItem = item()
-        .atSlot(0)
-        .displayAs(createItem(Material.RED_STAINED_GLASS_PANE, name = Component.text("")))
-        .onClick { onCancel(CancelInfo.fromClick(this)) }
+    private val cancelItem
+        get() = item()
+            .atSlot(0)
+            .displayAs(createItem(Material.RED_STAINED_GLASS_PANE, name = Component.text("")))
+            .onClick { onCancel(CancelInfo.fromClick(this)) }
 
 
     abstract fun getOtherItems(): List<InterfaceItem<T>>

@@ -78,7 +78,11 @@ abstract class RoosterInterface<T : Context>(
         return interfaceContextProvider.getContext(player, this)
     }
 
-    fun item(): InterfaceItem<T> = InterfaceItem(contextClass)
+    fun item(): InterfaceItem<T> {
+        //TODO: Link to docs
+        requireNotNull(contextClass) { "If you see this error, you used nested Interface Instances without while initializing items inside the parent directly, not lazily. Fore more, visit: -" }
+        return InterfaceItem(contextClass)
+    }
 
     private val currentInventorySize: MutableMap<Player, Int?> = mutableMapOf()
     private var groupedMapBySize: MutableMap<Int, Map<Slot, List<InterfaceItem<T>>>?> = mutableMapOf()

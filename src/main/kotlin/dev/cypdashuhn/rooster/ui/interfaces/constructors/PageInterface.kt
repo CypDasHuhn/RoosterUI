@@ -1,8 +1,6 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors
 
-import dev.cypdashuhn.rooster.common.util.ClickType
 import dev.cypdashuhn.rooster.common.util.createItem
-import dev.cypdashuhn.rooster.common.util.typeOf
 import dev.cypdashuhn.rooster.ui.UIWarnings
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
@@ -16,11 +14,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import kotlin.reflect.KClass
 
-/** Generally unfinished in every aspect. just ignore! */
-@Suppress("unused")
 abstract class PageInterface<T : PageInterface.PageContext>(
-    override var interfaceName: String,
-    override var contextClass: KClass<T>,
+    override val interfaceName: String,
+    override val contextClass: KClass<T>,
     pageOptions: PageInterfaceOptions<T> = PageInterfaceOptions<T>()
 ) : RoosterInterface<T>(interfaceName, contextClass, pageOptions) {
     // TODO: Handle different Page Turners
@@ -48,25 +44,28 @@ abstract class PageInterface<T : PageInterface.PageContext>(
 
     abstract fun getPages(): List<Page<T>>
 
-    val pageTurner =
-        item().atSlot(bottomBar + 8).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
-            if (event.typeOf(ClickType.LEFT_CLICK)) context.page += 1
-            else context.page -= 1
-            if (context.page < 0) context.page = 0
-        }
+    val pageTurner
+        get() = item().atSlot(bottomBar + 8).displayAs(createItem(Material.COMPASS, name = Component.empty()))
+            .modifyContext {
+                if (event.click.isLeftClick) context.page += 1
+                else context.page -= 1
+                if (context.page < 0) context.page = 0
+            }
 
-    val forwardPageTurner =
-        item().atSlot(bottomBar + 7).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
-            context.page += 1
-            if (context.page < 0) context.page = 0
-        }
-    val backwardsPageTurner =
-        item().atSlot(bottomBar + 6).displayAs(createItem(Material.COMPASS, name = Component.empty())).modifyContext {
-            context.page -= 1
-            if (context.page < 0) context.page = 0
-        }
+    val forwardPageTurner
+        get() = item().atSlot(bottomBar + 7).displayAs(createItem(Material.COMPASS, name = Component.empty()))
+            .modifyContext {
+                context.page += 1
+                if (context.page < 0) context.page = 0
+            }
+    val backwardsPageTurner
+        get() = item().atSlot(bottomBar + 6).displayAs(createItem(Material.COMPASS, name = Component.empty()))
+            .modifyContext {
+                context.page -= 1
+                if (context.page < 0) context.page = 0
+            }
 
-    override fun getInterfaceItems(): List<InterfaceItem<T>> {
+    final override fun getInterfaceItems(): List<InterfaceItem<T>> {
         val baseItems = mutableListOf<InterfaceItem<T>>()
 
         val pages = getPages()

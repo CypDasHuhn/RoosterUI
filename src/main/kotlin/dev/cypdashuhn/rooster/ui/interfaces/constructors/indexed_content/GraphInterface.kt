@@ -1,8 +1,6 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content
 
-import dev.cypdashuhn.rooster.common.util.ClickType
 import dev.cypdashuhn.rooster.common.util.createItem
-import dev.cypdashuhn.rooster.common.util.typeOf
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
 import dev.cypdashuhn.rooster.ui.interfaces.options
@@ -26,25 +24,27 @@ abstract class GraphInterface<ContextType : GraphInterface.GraphContext, DataTyp
         open var position: Pair<Int, Int> = 0 to 0
     ) : Context()
 
-    private val verticalPager = item()
-        .atSlot(bottomRow + 8)
-        .displayAs(createItem(Material.COMPASS))
-        .modifyContext {
-            val y = context.position.second
-            var scrollAmount = if (event.typeOf(ClickType.SHIFT_CLICK)) 5 else 1
-            if (event.typeOf(ClickType.LEFT_CLICK)) scrollAmount *= -1
-            context.position = context.position.first to y + scrollAmount
-        }
+    private val verticalPager
+        get() = item()
+            .atSlot(bottomRow + 8)
+            .displayAs(createItem(Material.COMPASS))
+            .modifyContext {
+                val y = context.position.second
+                var scrollAmount = if (event.isShiftClick) 5 else 1
+                if (event.click.isLeftClick) scrollAmount *= -1
+                context.position = context.position.first to y + scrollAmount
+            }
 
-    private val horizontalPager = item()
-        .atSlot(bottomRow + 8)
-        .displayAs(createItem(Material.COMPASS))
-        .modifyContext {
-            val x = context.position.first
-            var scrollAmount = if (event.typeOf(ClickType.SHIFT_CLICK)) 5 else 1
-            if (event.typeOf(ClickType.LEFT_CLICK)) scrollAmount *= -1
-            context.position = x + scrollAmount to context.position.second
-        }
+    private val horizontalPager
+        get() = item()
+            .atSlot(bottomRow + 8)
+            .displayAs(createItem(Material.COMPASS))
+            .modifyContext {
+                val x = context.position.first
+                var scrollAmount = if (event.isShiftClick) 5 else 1
+                if (event.click.isLeftClick) scrollAmount *= -1
+                context.position = x + scrollAmount to context.position.second
+            }
 
     final override fun getFrameItems(): List<InterfaceItem<ContextType>> = listOf(
         graphOptions.modifyVerticalPager(verticalPager),

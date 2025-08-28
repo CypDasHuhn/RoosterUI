@@ -25,6 +25,7 @@ class Slots {
         fun all() = Slots()
     }
 
-    fun targetsSlot(slot: Int) = slots.contains(slot) || all
+    fun targetsSlot(slot: Int) = all || slots.contains(slot)
 }
-fun Slots?.targetsSlot(slot: Int) = this?.targetsSlot(slot) ?: false
+
+fun Slots?.targetsSlot(slot: Int) = this?.targetsSlot(slot) ?: true

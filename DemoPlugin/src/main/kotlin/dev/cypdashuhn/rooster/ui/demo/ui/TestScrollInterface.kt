@@ -15,8 +15,7 @@ class Entry(
 )
 
 object TestScrollInterface :
-    ScrollInterface<TestScrollInterface.TestScrollContext, Entry>("test-scroll", TestScrollContext::class) {
-    class TestScrollContext : ScrollContext()
+    ScrollInterface<ScrollInterface.ScrollContext, Entry>("test-scroll", ScrollContext::class) {
 
     val list = listOf(
         Entry("Robert", Material.DIAMOND),
@@ -28,26 +27,26 @@ object TestScrollInterface :
 
     override fun contentDisplay(
         data: Entry,
-        context: TestScrollContext
-    ): InterfaceInfo<TestScrollContext>.() -> ItemStack {
+        context: ScrollContext
+    ): InterfaceInfo<ScrollContext>.() -> ItemStack {
         return { createItem(data.material, data.name.toComponent()) }
     }
 
     override fun contentClick(
         data: Entry,
-        context: TestScrollContext
-    ): ClickInfo<TestScrollContext>.() -> Unit {
+        context: ScrollContext
+    ): ClickInfo<ScrollContext>.() -> Unit {
         return { click.player.sendMessage(data.name) }
     }
 
     override fun contentProvider(
         id: Int,
-        context: TestScrollContext
+        context: ScrollContext
     ): Entry? {
-        return list[id]
+        return list.getOrNull(id)
     }
 
-    override fun defaultContext(player: Player): TestScrollContext {
-        return TestScrollContext()
+    override fun defaultContext(player: Player): ScrollContext {
+        return ScrollContext()
     }
 }

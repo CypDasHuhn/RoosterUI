@@ -1,8 +1,6 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content
 
-import dev.cypdashuhn.rooster.common.util.ClickType
 import dev.cypdashuhn.rooster.common.util.createItem
-import dev.cypdashuhn.rooster.common.util.typeOf
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
@@ -33,18 +31,19 @@ abstract class ScrollInterface<ContextType : ScrollInterface.ScrollContext, Data
     private val rowSize: Int
         get() = if (scrollOptions.scrollDirection == ScrollDirection.LEFT_RIGHT) contentXWidth else contentYWidth
 
-    private val scroller = item()
-        .atSlot(bottomRow + 8)
-        .displayAs(createItem(Material.COMPASS))
-        .modifyContext {
-            var scrollAmount = if (event.typeOf(ClickType.SHIFT_CLICK)) 5 else 1
-            if (event.typeOf(ClickType.LEFT_CLICK)) scrollAmount *= -1
+    private val scroller
+        get() = item()
+            .atSlot(bottomRow + 8)
+            .displayAs(createItem(Material.COMPASS))
+            .modifyContext {
+                var scrollAmount = if (event.click.isShiftClick) 5 else 1
+                if (event.click.isLeftClick) scrollAmount *= -1
 
-            context.position += scrollAmount
-            if (context.position < 0) context.position = 0
-        }.also {
-            scrollOptions.modifyScroller(it)
-        }
+                context.position += scrollAmount
+                if (context.position < 0) context.position = 0
+            }.also {
+                scrollOptions.modifyScroller(it)
+            }
 
 
     final override fun getFrameItems(): List<InterfaceItem<ContextType>> = listOf(

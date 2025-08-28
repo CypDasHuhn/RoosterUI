@@ -3,6 +3,7 @@ package dev.cypdashuhn.rooster.ui.demo
 import dev.cypdashuhn.rooster.ui.RoosterUI
 import dev.cypdashuhn.rooster.ui.demo.commands.demo
 import dev.cypdashuhn.rooster.ui.demo.ui.TestInterface
+import dev.cypdashuhn.rooster.ui.demo.ui.TestPageInterface
 import dev.cypdashuhn.rooster.ui.demo.ui.TestScrollInterface
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIBukkitConfig
@@ -18,7 +19,7 @@ class DemoPlugin : JavaPlugin() {
     override fun onEnable() {
         CommandAPI.onEnable()
 
-        RoosterUI.init(this, listOf(TestInterface, TestScrollInterface))
+        RoosterUI.init(this, listOf(TestInterface, TestPageInterface, TestScrollInterface))
     }
 
     override fun onDisable() {

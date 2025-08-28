@@ -4,6 +4,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import kotlin.reflect.KClass
 
 typealias Slot = Int
 
@@ -36,6 +37,18 @@ data class Click(
  * four your interface. Basically some sort of value that is being
  * saved in between clicks, to save the current state of the interface.
  */
-abstract class Context
+open class Context
 
+class ContextManager<T : Context> {
+    val clazz: KClass<T>
+    val defaultContext: (Player) -> T
+
+    constructor(clazz: KClass<T>, defaultContext: (Player) -> T) {
+        this.clazz = clazz
+        this.defaultContext = defaultContext
+    }
+}
+
+fun <T : Context> KClass<T>.toManager(defaultContext: (Player) -> T) = ContextManager(this, defaultContext)
+val defaultContextManager = Context::class.toManager { Context() }
 val emptyContext = object : Context() {}

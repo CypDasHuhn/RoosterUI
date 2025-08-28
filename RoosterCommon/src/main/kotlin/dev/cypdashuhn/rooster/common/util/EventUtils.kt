@@ -51,7 +51,7 @@ infix fun InventoryClickEvent.typeOf(clickType: ClickType): Boolean {
 
 fun InventoryClickEvent.typeOf(vararg clickTypes: ClickType, allTrue: Boolean): Boolean {
     val condition = { it: ClickType ->
-        it.isShift == null || it.isShift == this.isShiftClick &&
+        it.isShift == null || it.isShift == this.click.isShiftClick &&
                 it.mouseClickType == null || it.mouseClickType == this.mouseClickType()
     }
     return if (allTrue) clickTypes.all(condition) else clickTypes.any(condition)

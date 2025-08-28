@@ -1,15 +1,26 @@
 package dev.cypdashuhn.rooster.ui.demo.commands
 
 import dev.cypdashuhn.rooster.ui.demo.ui.TestInterface
-import dev.cypdashuhn.rooster.ui.interfaces.constructors.NoContextInterface
+import dev.cypdashuhn.rooster.ui.demo.ui.TestPageInterface
+import dev.cypdashuhn.rooster.ui.demo.ui.TestScrollInterface
 import dev.jorel.commandapi.CommandAPICommand
+import dev.jorel.commandapi.arguments.ArgumentSuggestions
+import dev.jorel.commandapi.arguments.StringArgument
 import dev.jorel.commandapi.executors.CommandExecutor
 import org.bukkit.entity.Player
 
+val interfaces = listOf(TestInterface, TestPageInterface, TestScrollInterface)
 fun demo() {
     CommandAPICommand("test-interface")
-        .executes(CommandExecutor { sender, _ ->
-            TestInterface.openInventory(sender as Player, NoContextInterface.EmptyContext())
+        .withArguments(
+            StringArgument("interface").replaceSuggestions(
+                ArgumentSuggestions.strings(
+            interfaces.map { it.interfaceName }
+        )))
+        .executes(CommandExecutor { sender, context ->
+            val target = interfaces.firstOrNull { it.interfaceName == context["interface"] }
+            if (target == null) sender.sendMessage("Interface not found, ${context["interface"]}")
+            target?.openInventory(sender as Player)
         })
         .register()
 }

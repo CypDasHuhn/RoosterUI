@@ -53,30 +53,32 @@ abstract class IndexedContentInterface<ContextType : Context, IdType : Any, Data
         }
     }
 
-    private val contentItem = item()
-        .usedWhen {
-            if (offset(slot) != null) return@usedWhen false
-            val data = dataFromPosition(slot, context, player)
-            data != null
-        }
-        .displayAs {
-            val data = dataFromPosition(slot, context, player)!!
-            contentDisplay(data, context).invoke(this)
-        }
-        .onClick {
-            val data = dataFromPosition(click.slot, context, click.player)!!
-            contentClick(data, context).invoke(this)
-        }
+    private val contentItem
+        get() = item()
+            .usedWhen {
+                if (offset(slot) == null) return@usedWhen false
+                val data = dataFromPosition(slot, context, player)
+                data != null
+            }
+            .displayAs {
+                val data = dataFromPosition(slot, context, player)!!
+                contentDisplay(data, context).invoke(this)
+            }
+            .onClick {
+                val data = dataFromPosition(click.slot, context, click.player)!!
+                contentClick(data, context).invoke(this)
+            }
 
-    private val clickInArea = item()
-        .usedWhen {
-            if (offset(slot) != null) return@usedWhen false
-            val dataExists = dataFromPosition(slot, context, player) != null
-            !dataExists
-        }
-        .displayAs(ItemStack(Material.AIR))
-        .priority(-1)
-        .onClick { }
+    private val clickInArea
+        get() = item()
+            .usedWhen {
+                if (offset(slot) != null) return@usedWhen false
+                val dataExists = dataFromPosition(slot, context, player) != null
+                !dataExists
+            }
+            .displayAs(ItemStack(Material.AIR))
+            .priority(-1)
+            .onClick { }
 
     abstract fun contentDisplay(data: DataType, context: ContextType): InterfaceInfo<ContextType>.() -> ItemStack
     abstract fun contentClick(data: DataType, context: ContextType): ClickInfo<ContextType>.() -> Unit

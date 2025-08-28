@@ -1,10 +1,10 @@
 package dev.cypdashuhn.rooster.ui.items
 
+import dev.cypdashuhn.rooster.common.util.createItem
 import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
 import dev.cypdashuhn.rooster.ui.interfaces.constructors.NoContextInterface
-import dev.cypdashuhn.rooster.common.util.createItem
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
@@ -29,10 +29,12 @@ class InterfaceItem<T : Context> {
         get() = {
             onClick?.invoke(this)
             contextModifier?.invoke(this)
-            this.clickedInterface.openInventory(click.player, this.context)
+
         }
 
-    internal fun check(info: InterfaceInfo<T>) = (slots != null && slots.targetsSlot(info.slot)) || condition.flattend(info)
+    internal fun check(info: InterfaceInfo<T>): Boolean {
+        return slots.targetsSlot(info.slot) && condition.flattend(info)
+    }
 
     fun usedWhen(
         conditionKey: String = ConditionMap.ANONYMOUS_KEY,
@@ -69,8 +71,15 @@ class InterfaceItem<T : Context> {
 
     /** Does something when the item is clicked */
     fun onClick(action: ClickInfo<T>.() -> Unit): InterfaceItem<T> = copy { this.onClick = action }
-    /** Modifies the context of the click info when the item is clicked, and opens the inventory with the modified context */
-    fun modifyContext(action: ClickInfo<T>.() -> Unit): InterfaceItem<T> = copy { this.contextModifier = action }
+
+    /** Modifies the context of the click info when the item is clicked, and opens the inventory with the modified context by default */
+    fun modifyContext(openInventory: Boolean = true, action: ClickInfo<T>.() -> Unit): InterfaceItem<T> = copy {
+        if (!openInventory) this.contextModifier = action
+        else this.contextModifier = {
+            action()
+            clickedInterface.openInventory(click.player, context)
+        }
+    }
 
     fun displayAs(itemStackCreator: InterfaceInfo<T>.() -> ItemStack) =
         copy { this.displayItem = itemStackCreator }
@@ -78,11 +87,12 @@ class InterfaceItem<T : Context> {
     fun displayAs(itemStack: ItemStack): InterfaceItem<T> = copy { this.displayItem = { itemStack } }
 
     fun copy(modifyingBlock: InterfaceItem<T>.() -> Unit): InterfaceItem<T> {
-        val copy = InterfaceItem<T>(contextClass).also {
+        val copy = InterfaceItem(contextClass).also {
             it.condition = condition.copy()
             it.displayItem = displayItem
             it.onClick = onClick
             it.priority = priority
+            it.slots = slots
         }
         copy.modifyingBlock()
         return copy
