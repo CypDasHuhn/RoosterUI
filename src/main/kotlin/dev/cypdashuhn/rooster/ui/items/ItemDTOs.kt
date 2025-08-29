@@ -48,7 +48,10 @@ class ConditionMap<T : Context> {
             .forEach { conditionMap.remove(it) }
     }
 
-    val flattend by lazy { { info: InterfaceInfo<T> -> conditionMap.values.all { condition -> condition(info) } } }
+    val flattend by lazy {
+        if (conditionMap.values.count() == 0) { info: InterfaceInfo<T> -> true }
+        else { info: InterfaceInfo<T> -> conditionMap.values.all { condition -> condition(info) } }
+    }
     fun getMap(): Map<String, ((InterfaceInfo<T>) -> Boolean)> = conditionMap
     fun copy(): ConditionMap<T> = ConditionMap<T>(conditionMap, clazz)
 }
@@ -95,7 +98,7 @@ class ItemStackCreator<T : Context> {
     }
 }
 
-class ItemStackList<T : Context>(val itemStackList: List<InterfaceItem<T>>) {
+class ItemStackList<T : Context>(itemStackList: List<InterfaceItem<T>>) {
     val get: (InterfaceInfo<T>) -> InterfaceItem<T>?
 
     init {
@@ -106,7 +109,6 @@ class ItemStackList<T : Context>(val itemStackList: List<InterfaceItem<T>>) {
         val (conditionLess, conditionBased) = staticItems.partition {
             it.condition.getMap().count() == 0
         }
-        val conditionLessCount = conditionLess.count()
         val conditionBasedCount = conditionBased.count()
         val maxPriority = conditionBased.maxByOrNull { it.staticPriority!! }
         val maxPriorityConditionless = conditionLess.maxByOrNull { it.staticPriority!! }
@@ -140,12 +142,15 @@ class ItemStackList<T : Context>(val itemStackList: List<InterfaceItem<T>>) {
                 if (maxPriorityConditionless != null) usableList.add(maxPriorityConditionless)
                 usableList.addAll(conditionBased)
             }
+            val mappedStatic = staticItems.map { it to it.staticPriority }
             get = { info ->
                 val solvedPriority = dynamicItems.map { it to it.priority(info) }
-                val maxPriorityDynamic = solvedPriority.maxByOrNull { it.second }?.first
-
-
-                null
+                val maxPriorityDynamic = solvedPriority.maxByOrNull { it.second }
+                if (maxPriorityDynamic!!.second < (maxPriorityConditionless?.staticPriority ?: -1)) {
+                    maxPriorityConditionless
+                }
+                val list = (solvedPriority + mappedStatic).sortedBy { it.second }
+                list.firstOrNull { it.first.condition.flattend(info) }?.first
             }
         }
     }

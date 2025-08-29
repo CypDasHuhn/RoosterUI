@@ -2,6 +2,7 @@ package dev.cypdashuhn.rooster.ui.interfaces
 
 import dev.cypdashuhn.rooster.ui.RoosterUI.interfaceContextProvider
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
+import dev.cypdashuhn.rooster.ui.items.ItemStackList
 import dev.cypdashuhn.rooster.ui.items.targetsNullableSlot
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -94,9 +95,9 @@ abstract class RoosterInterface<T : Context>(
             .flatMap { it.slots.toList() }
             .maxOrNull() ?: return emptyMap()
 
-        val map = mutableMapOf<Slot, List<InterfaceItem<T>>>()
+        val map = mutableMapOf<Slot, List<ItemStackList<T>>>()
         for (i in 0..maxSlot) {
-            map += i to items.filter { it.slots.targetsNullableSlot(i) }
+            map += i to ItemStackList(items.filter { it.slots.targetsNullableSlot(i) })
         }
 
         val inventorySize = currentInventorySize[player] ?: getInventory(player, context).size
