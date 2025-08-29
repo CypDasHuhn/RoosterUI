@@ -1,10 +1,11 @@
 package dev.cypdashuhn.rooster.ui.items
 
+import dev.cypdashuhn.rooster.common.util.createItem
+import dev.cypdashuhn.rooster.common.util.infix_gate.and
+import dev.cypdashuhn.rooster.common.util.nextName
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
-import dev.cypdashuhn.rooster.common.util.*
-import dev.cypdashuhn.rooster.common.util.infix_gate.and
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -91,5 +92,61 @@ class ItemStackCreator<T : Context> {
 
     operator fun invoke(): (InterfaceInfo<T>) -> ItemStack {
         return itemStackCreator
+    }
+}
+
+class ItemStackList<T : Context>(val itemStackList: List<InterfaceItem<T>>) {
+    val get: (InterfaceInfo<T>) -> InterfaceItem<T>?
+
+    init {
+        val (staticItems, dynamicItems) = itemStackList.partition { it.staticPriority != null }
+        val staticItemsCount = staticItems.count()
+        val dynamicItemsCount = dynamicItems.count()
+
+        val (conditionLess, conditionBased) = staticItems.partition {
+            it.condition.getMap().count() == 0
+        }
+        val conditionLessCount = conditionLess.count()
+        val conditionBasedCount = conditionBased.count()
+        val maxPriority = conditionBased.maxByOrNull { it.staticPriority!! }
+        val maxPriorityConditionless = conditionLess.maxByOrNull { it.staticPriority!! }
+
+        if (dynamicItemsCount == 0) {
+            if (staticItemsCount == 0) get = { null }
+            else if (staticItemsCount == 1) {
+                val only = staticItems.first()
+                if (only.condition.getMap().count() == 0) get = { only }
+                else get = { if (only.condition.flattend(it)) only else null }
+            } else {
+
+                if (conditionBasedCount == 0) {
+                    get = { maxPriorityConditionless }
+                } else {
+                    if (maxPriorityConditionless != null && maxPriorityConditionless.staticPriority!! > maxPriority!!.staticPriority!!) get =
+                        { maxPriorityConditionless }
+                    else {
+                        val list = conditionBased.toMutableList()
+                        if (maxPriorityConditionless != null) list.add(maxPriorityConditionless)
+                        list.sortBy { it.staticPriority }
+                        get = { info -> list.firstOrNull { it.condition.flattend(info) } }
+                    }
+                }
+            }
+
+        } else {
+            val usableList = mutableListOf<InterfaceItem<T>>()
+            if (conditionBasedCount == 0 && maxPriorityConditionless != null) usableList.add(maxPriorityConditionless)
+            else {
+                if (maxPriorityConditionless != null) usableList.add(maxPriorityConditionless)
+                usableList.addAll(conditionBased)
+            }
+            get = { info ->
+                val solvedPriority = dynamicItems.map { it to it.priority(info) }
+                val maxPriorityDynamic = solvedPriority.maxByOrNull { it.second }?.first
+
+
+                null
+            }
+        }
     }
 }

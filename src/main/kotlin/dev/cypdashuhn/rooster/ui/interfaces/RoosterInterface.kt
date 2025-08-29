@@ -2,6 +2,7 @@ package dev.cypdashuhn.rooster.ui.interfaces
 
 import dev.cypdashuhn.rooster.ui.RoosterUI.interfaceContextProvider
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
+import dev.cypdashuhn.rooster.ui.items.targetsNullableSlot
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -87,7 +88,17 @@ abstract class RoosterInterface<T : Context>(
     private val currentInventorySize: MutableMap<Player, Int?> = mutableMapOf()
     private var groupedMapBySize: MutableMap<Int, Map<Slot, List<InterfaceItem<T>>>?> = mutableMapOf()
 
-    internal fun groupedItems(player: Player, context: T): Map<Slot, List<InterfaceItem<T>>> {
+    internal fun groupedItems(player: Player): Map<Slot, List<InterfaceItem<T>>> {
+        val maxSlot = items
+            .mapNotNull { it.slots }
+            .flatMap { it.slots.toList() }
+            .maxOrNull() ?: return emptyMap()
+
+        val map = mutableMapOf<Slot, List<InterfaceItem<T>>>()
+        for (i in 0..maxSlot) {
+            map += i to items.filter { it.slots.targetsNullableSlot(i) }
+        }
+
         val inventorySize = currentInventorySize[player] ?: getInventory(player, context).size
         val grouping = groupedMapBySize[inventorySize]
 

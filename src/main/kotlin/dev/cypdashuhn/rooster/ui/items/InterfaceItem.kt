@@ -19,7 +19,9 @@ class InterfaceItem<T : Context> {
 
     internal var slots: Slots? = null
     internal var condition: ConditionMap<T>
+
     internal var priority: (InterfaceInfo<T>.() -> Int) = { -1 }
+    internal var staticPriority: Int? = null
 
     internal var displayItem: (InterfaceInfo<T>.() -> ItemStack) = { createItem(Material.BARRIER) }
 
@@ -67,6 +69,7 @@ class InterfaceItem<T : Context> {
 
     fun priority(priority: Int): InterfaceItem<T> = copy {
         this.priority = { it: InterfaceInfo<T> -> priority }
+        this.staticPriority = priority
     }
 
     /** Does something when the item is clicked */
