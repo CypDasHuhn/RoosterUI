@@ -7,14 +7,11 @@ import dev.cypdashuhn.rooster.ui.interfaces.options
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import kotlin.reflect.KClass
 
-/** Interface not finished, don't use! */
 abstract class GraphInterface<ContextType : GraphInterface.GraphContext, DataType : Any>(
     override val interfaceName: String,
-    override val contextClass: KClass<ContextType>,
     val graphOptions: GraphOptions<ContextType> = options { }
-) : IndexedContentInterface<ContextType, Pair<Int, Int>, DataType>(interfaceName, contextClass, graphOptions) {
+) : IndexedContentInterface<ContextType, Pair<Int, Int>, DataType>(interfaceName,  graphOptions) {
     class GraphOptions<T : Context> : IndexedContentOptions<T>() {
         var modifyVerticalPager: InterfaceItem<T>.() -> InterfaceItem<T> = { this }
         var modifyHorizontalPager: InterfaceItem<T>.() -> InterfaceItem<T> = { this }

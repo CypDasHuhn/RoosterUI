@@ -2,14 +2,13 @@ package dev.cypdashuhn.rooster.ui.interfaces
 
 import dev.cypdashuhn.rooster.ui.RoosterUI.interfaceContextProvider
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
-import dev.cypdashuhn.rooster.ui.items.ItemStackList
+import dev.cypdashuhn.rooster.ui.items.InterfaceItemList
 import dev.cypdashuhn.rooster.ui.items.targetsNullableSlot
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
-import kotlin.reflect.KClass
 
 
 inline fun <T : Context, reified E : RoosterInterface.RoosterInterfaceOptions<T>> options(
@@ -27,9 +26,8 @@ inline fun <T : Context, reified E : RoosterInterface.RoosterInterfaceOptions<T>
  */
 abstract class RoosterInterface<T : Context>(
     open val interfaceName: String,
-    open val contextClass: KClass<T>,
     val options: RoosterInterfaceOptions<T> = options { }
-) {
+) : ContextHandler<T> {
     open class RoosterInterfaceOptions<T : Context>() {
         // Click behaviour
         var cancelEvent: (ClickInfo<T>) -> Boolean = { true }
@@ -53,15 +51,14 @@ abstract class RoosterInterface<T : Context>(
     }
 
     abstract fun getInterfaceItems(): List<InterfaceItem<T>>
-    abstract fun defaultContext(player: Player): T
 
     open fun onClose(player: Player, context: T, event: InventoryCloseEvent) {}
 
-    internal fun forEachVisibleItem(info: InterfaceInfo<T>, action: (InterfaceItem<T>) -> Unit) {
-        items
-            .filter { it.check(info) }
-            .sortedBy { it.priority(info) }
-            .forEach(action)
+    internal fun forVisibleItem(info: InterfaceInfo<T>, action: (InterfaceItem<T>) -> Unit) {
+        val items = groupedItems(info.player)[info.slot]
+        requireNotNull(items) { "Slot somehow not included" }
+        val target = items.get(info)
+        if (target != null) action(target)
     }
 
     fun openInventory(player: Player): Inventory {
@@ -80,41 +77,24 @@ abstract class RoosterInterface<T : Context>(
         return interfaceContextProvider.getContext(player, this)
     }
 
-    fun item(): InterfaceItem<T> {
-        //TODO: Link to docs
-        requireNotNull(contextClass) { "If you see this error, you used nested Interface Instances without while initializing items inside the parent directly, not lazily. Fore more, visit: -" }
-        return InterfaceItem(contextClass)
-    }
+    val groupedItems = emptyMap<Player, Map<Slot, InterfaceItemList<T>>>().toMutableMap()
+    internal fun groupedItems(player: Player): Map<Slot, InterfaceItemList<T>> {
+        val cachedItems = groupedItems[player]
+        if (cachedItems != null) return cachedItems
 
-    private val currentInventorySize: MutableMap<Player, Int?> = mutableMapOf()
-    private var groupedMapBySize: MutableMap<Int, Map<Slot, List<InterfaceItem<T>>>?> = mutableMapOf()
-
-    internal fun groupedItems(player: Player): Map<Slot, List<InterfaceItem<T>>> {
         val maxSlot = items
             .mapNotNull { it.slots }
             .flatMap { it.slots.toList() }
             .maxOrNull() ?: return emptyMap()
 
-        val map = mutableMapOf<Slot, List<ItemStackList<T>>>()
+        val map = mutableMapOf<Slot, InterfaceItemList<T>>()
         for (i in 0..maxSlot) {
-            map += i to ItemStackList(items.filter { it.slots.targetsNullableSlot(i) })
+            val items = items.filter { it.slots.targetsNullableSlot(i) }
+            val list = InterfaceItemList(items)
+            map += i to list
         }
 
-        val inventorySize = currentInventorySize[player] ?: getInventory(player, context).size
-        val grouping = groupedMapBySize[inventorySize]
-
-        return if (grouping != null) grouping else {
-            val map: MutableMap<Slot, MutableList<InterfaceItem<T>>> = mutableMapOf()
-            val allSlots = (0..<inventorySize).toList().toTypedArray()
-            items.forEach { item ->
-                val slots = if (item.slots?.all ?: false) allSlots else item.slots?.slots
-                slots?.forEach { slot ->
-                    map.getOrPut(slot) { mutableListOf() }.add(item)
-                }
-            }
-
-            groupedMapBySize[inventorySize] = map
-            map
-        }
+        groupedItems += player to map
+        return map
     }
 }

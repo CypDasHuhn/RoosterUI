@@ -12,13 +12,11 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
-import kotlin.reflect.KClass
 
 abstract class PageInterface<T : PageInterface.PageContext>(
     override val interfaceName: String,
-    override val contextClass: KClass<T>,
     pageOptions: PageInterfaceOptions<T> = PageInterfaceOptions<T>()
-) : RoosterInterface<T>(interfaceName, contextClass, pageOptions) {
+) : RoosterInterface<T>(interfaceName, pageOptions) {
     // TODO: Handle different Page Turners
     open class PageInterfaceOptions<T : Context> : RoosterInterfaceOptions<T>() {
         var pageTurnerModifier: (InterfaceItem<T>) -> InterfaceItem<T> = { it }

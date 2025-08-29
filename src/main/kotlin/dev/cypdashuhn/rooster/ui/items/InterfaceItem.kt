@@ -4,7 +4,6 @@ import dev.cypdashuhn.rooster.common.util.createItem
 import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
-import dev.cypdashuhn.rooster.ui.interfaces.constructors.NoContextInterface
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
@@ -65,10 +64,11 @@ class InterfaceItem<T : Context> {
         priority: InterfaceInfo<T>.() -> Int,
     ): InterfaceItem<T> = copy {
         this.priority = { it: InterfaceInfo<T> -> priority(it) }
+        this.staticPriority = null
     }
 
     fun priority(priority: Int): InterfaceItem<T> = copy {
-        this.priority = { it: InterfaceInfo<T> -> priority }
+        this.priority = { priority }
         this.staticPriority = priority
     }
 
@@ -95,44 +95,10 @@ class InterfaceItem<T : Context> {
             it.displayItem = displayItem
             it.onClick = onClick
             it.priority = priority
+            it.staticPriority = staticPriority
             it.slots = slots
         }
         copy.modifyingBlock()
         return copy
     }
-
-    class ItemsForSlot<T : Context>(
-        val items: List<InterfaceItem<T>>,
-        val contextClass: Class<T>
-    ) {
-        var dynamicPriorityItems: List<InterfaceItem<T>> = listOf()
-        var staticPriorityItems: List<InterfaceItem<T>> = listOf()
-        var staticPriorityItemsSorted: List<Pair<InterfaceItem<T>, Int>>? = null
-
-        var get: (InterfaceInfo<T>) -> InterfaceItem<T>? = { info ->
-            staticPriorityItemsSorted = staticPriorityItems
-                .map { it to it.priority(info) }
-                .sortedByDescending { it.second }
-
-            get = { info: InterfaceInfo<T> ->
-                val entry = staticPriorityItemsSorted!!.firstOrNull { (item, _) -> item.condition.flattend(info) }
-                val condition =
-                    if (entry == null) { it: InterfaceItem<T> -> true }
-                    else { it: InterfaceItem<T> -> it.priority(info) > entry.second }
-                val other = dynamicPriorityItems.firstOrNull { it.condition.flattend(info) && condition(it) }
-                other ?: entry?.first
-            }
-
-            get(info)
-        }
-    }
-}
-
-
-fun main() {
-
-    InterfaceItem(NoContextInterface.EmptyContext::class)
-        .atSlot(1)
-        .displayAs { createItem(Material.COMPASS) }
-        .onClick { }
 }

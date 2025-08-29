@@ -11,16 +11,13 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
-import kotlin.reflect.KClass
-
 
 abstract class BaseConfirmationInterface<T : Context>(
     override val interfaceName: String,
-    override val contextClass: KClass<T>,
     open val onConfirm: (ClickInfo<T>) -> Unit,
     open val onCancel: (CancelInfo<T>) -> Unit,
     val baseConfirmationOptions: BaseConfirmationOptions<T> = options { }
-) : RoosterInterface<T>(interfaceName, contextClass) {
+) : RoosterInterface<T>(interfaceName) {
     class BaseConfirmationOptions<T : Context> : RoosterInterfaceOptions<T>() {
         var modifyConfirmationItem: InterfaceItem<T>.() -> InterfaceItem<T> = { this }
         var modifyCancelItem: InterfaceItem<T>.() -> InterfaceItem<T> = { this }

@@ -1,5 +1,6 @@
 package dev.cypdashuhn.rooster.ui.interfaces
 
+import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -39,16 +40,26 @@ data class Click(
  */
 open class Context
 
-class ContextManager<T : Context> {
-    val clazz: KClass<T>
-    val defaultContext: (Player) -> T
-
-    constructor(clazz: KClass<T>, defaultContext: (Player) -> T) {
-        this.clazz = clazz
-        this.defaultContext = defaultContext
-    }
+interface ContextHandler<T : Context> {
+    val contextClass: KClass<T>
+    fun item() = InterfaceItem(contextClass)
+    fun defaultContext(player: Player): T
 }
 
-fun <T : Context> KClass<T>.toManager(defaultContext: (Player) -> T) = ContextManager(this, defaultContext)
-val defaultContextManager = Context::class.toManager { Context() }
-val emptyContext = object : Context() {}
+object DefaultContextHandler : ContextHandler<Context> {
+    override val contextClass: KClass<Context> = Context::class
+    override fun defaultContext(player: Player) = Context()
+}
+
+fun <T : Context> KClass<T>.toHandler(defaultContext: (Player) -> T) = object : ContextHandler<T> {
+    override val contextClass: KClass<T> = this@toHandler
+    override fun defaultContext(player: Player): T = defaultContext(player)
+}
+
+fun <T : Context> KClass<T>.toHandler(defaultContext: T) = this.toHandler { defaultContext }
+
+inline fun <reified T : Context> handler(noinline default: (Player) -> T) =
+    T::class.toHandler(default)
+
+inline fun <reified T : Context> handler(default: T) =
+    T::class.toHandler(default)

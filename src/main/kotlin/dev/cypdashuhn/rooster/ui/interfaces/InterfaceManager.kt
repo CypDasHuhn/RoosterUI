@@ -15,6 +15,7 @@ internal object InterfaceManager {
         cache.invalidate(CURRENT_INTERFACE_KEY, player)
 
         // Invoke onClose for the interface
+        @Suppress("UNCHECKED_CAST")
         val correspondingInterface = currentInterface(player) as RoosterInterface<Context>? ?: return
         val context = correspondingInterface.getContext(player)
         correspondingInterface.onClose(player, context, event)
@@ -47,7 +48,7 @@ internal object InterfaceManager {
         val inventory = targetInventory.getInventory(player, context)
         for (slot in 0 until inventory.size) {
             val info = InterfaceInfo(slot, context, player)
-            targetInventory.forEachVisibleItem(info) {
+            targetInventory.forVisibleItem(info) {
                 inventory.setItem(slot, it.displayItem(info))
             }
         }
@@ -72,6 +73,7 @@ internal object InterfaceManager {
 
         val click = Click(event, player, event.currentItem, event.currentItem?.type, event.slot)
 
+        @Suppress("UNCHECKED_CAST")
         val typedInterface = targetInterface as RoosterInterface<Context>
 
         val context = typedInterface.getContext(player)
@@ -80,6 +82,6 @@ internal object InterfaceManager {
         val clickInfo = ClickInfo(click, context, event, targetInterface)
         if (typedInterface.options.cancelEvent(clickInfo)) event.isCancelled = true
 
-        typedInterface.forEachVisibleItem(info) { it.onClickMerged(clickInfo) }
+        typedInterface.forVisibleItem(info) { it.onClickMerged(clickInfo) }
     }
 }

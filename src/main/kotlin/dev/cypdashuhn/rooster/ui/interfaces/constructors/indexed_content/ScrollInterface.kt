@@ -6,13 +6,11 @@ import dev.cypdashuhn.rooster.ui.interfaces.Slot
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import kotlin.reflect.KClass
 
 abstract class ScrollInterface<ContextType : ScrollInterface.ScrollContext, DataType : Any>(
     override var interfaceName: String,
-    override var contextClass: KClass<ContextType>,
     val scrollOptions: ScrollInterfaceOptions<ContextType> = ScrollInterfaceOptions()
-) : IndexedContentInterface<ContextType, Int, DataType>(interfaceName, contextClass, scrollOptions) {
+) : IndexedContentInterface<ContextType, Int, DataType>(interfaceName, scrollOptions) {
     open class ScrollInterfaceOptions<T : Context> : IndexedContentOptions<T>() {
         var scrollDirection: ScrollDirection = ScrollDirection.TOP_BOTTOM
 

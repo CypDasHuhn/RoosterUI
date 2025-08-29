@@ -14,6 +14,7 @@ enum class UIWarnings(
         "Interface pages are empty!"
     }, INTERFACE_PAGES),
     INTERFACE_PAGES_OVERLAP({
+        @Suppress("UNCHECKED_CAST")
         val map = it as Map<Int, Int>
         val string = map.map { "${it.key} (${it.value}x)" }.joinToString { ", " }
         "Following Interface Pages defined multiple Times: $string"

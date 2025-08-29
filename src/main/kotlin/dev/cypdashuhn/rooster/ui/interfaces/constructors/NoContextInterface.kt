@@ -1,17 +1,8 @@
 package dev.cypdashuhn.rooster.ui.interfaces.constructors
 
-import dev.cypdashuhn.rooster.ui.interfaces.Context
-import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
-import dev.cypdashuhn.rooster.ui.interfaces.options
-import org.bukkit.entity.Player
+import dev.cypdashuhn.rooster.ui.interfaces.*
 
 abstract class NoContextInterface(
     override var interfaceName: String,
-    options: RoosterInterfaceOptions<EmptyContext> = options { }
-) : RoosterInterface<NoContextInterface.EmptyContext>(interfaceName, EmptyContext::class, options) {
-    class EmptyContext : Context()
-
-    override fun defaultContext(player: Player): EmptyContext {
-        return EmptyContext()
-    }
-}
+    options: RoosterInterfaceOptions<Context> = options { }
+) : RoosterInterface<Context>(interfaceName, options), ContextHandler<Context> by DefaultContextHandler

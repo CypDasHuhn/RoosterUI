@@ -5,14 +5,12 @@ import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import kotlin.reflect.KClass
 
 
 abstract class IndexedContentInterface<ContextType : Context, IdType : Any, DataType : Any>(
     interfaceName: InterfaceName,
-    contextClass: KClass<ContextType>,
     indexedContentOptions: IndexedContentOptions<ContextType> = IndexedContentOptions()
-) : RoosterInterface<ContextType>(interfaceName, contextClass, indexedContentOptions) {
+) : RoosterInterface<ContextType>(interfaceName, indexedContentOptions) {
     open class IndexedContentOptions<T : Context> : RoosterInterfaceOptions<T>() {
         var contentArea: Pair<Pair<Int, Int>, Pair<Int, Int>> = (0 to 0) to (8 to 5)
 
@@ -53,10 +51,18 @@ abstract class IndexedContentInterface<ContextType : Context, IdType : Any, Data
         }
     }
 
+    fun allValidSlots(): List<Int> {
+        return contentXRange.flatMap { x ->
+            contentYRange.map { y ->
+                (y + contentAreaStartY) * 9 + (x + contentAreaStartX)
+            }
+        }
+    }
+
     private val contentItem
         get() = item()
+            .atSlots(allValidSlots())
             .usedWhen {
-                if (offset(slot) == null) return@usedWhen false
                 val data = dataFromPosition(slot, context, player)
                 data != null
             }
@@ -71,8 +77,8 @@ abstract class IndexedContentInterface<ContextType : Context, IdType : Any, Data
 
     private val clickInArea
         get() = item()
+            .atSlots((0..(6 * 9)) - allValidSlots().toSet())
             .usedWhen {
-                if (offset(slot) != null) return@usedWhen false
                 val dataExists = dataFromPosition(slot, context, player) != null
                 !dataExists
             }
