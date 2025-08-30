@@ -1,11 +1,11 @@
 package dev.cypdashuhn.rooster.ui.demo.ui
 
 import dev.cypdashuhn.rooster.common.util.createItem
-import dev.cypdashuhn.rooster.ui.interfaces.constructors.PageInterface
+import dev.cypdashuhn.rooster.ui.interfaces.constructors.DefaultPageInterface
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
-object TestPageInterface : PageInterface<PageInterface.PageContext>("test-page", PageContext::class) {
+object TestPageInterface : DefaultPageInterface("test-page") {
     val test = item().atSlot(4).displayAs(createItem(Material.DIAMOND)).onClick {
         click.player.sendMessage("test")
     }

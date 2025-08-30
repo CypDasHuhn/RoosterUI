@@ -3,8 +3,10 @@ package dev.cypdashuhn.rooster.ui.interfaces.constructors
 import dev.cypdashuhn.rooster.common.util.createItem
 import dev.cypdashuhn.rooster.ui.UIWarnings
 import dev.cypdashuhn.rooster.ui.interfaces.Context
+import dev.cypdashuhn.rooster.ui.interfaces.ContextHandler
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
 import dev.cypdashuhn.rooster.ui.interfaces.constructors.PageInterface.Page
+import dev.cypdashuhn.rooster.ui.interfaces.handler
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -12,6 +14,12 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
+
+abstract class DefaultPageInterface(
+    interfaceName: String,
+    pageOptions: PageInterfaceOptions<PageContext> = PageInterfaceOptions<PageContext>()
+) : PageInterface<PageInterface.PageContext>(interfaceName, pageOptions),
+    ContextHandler<PageInterface.PageContext> by PageContext.defaultHandler
 
 abstract class PageInterface<T : PageInterface.PageContext>(
     override val interfaceName: String,
@@ -32,8 +40,12 @@ abstract class PageInterface<T : PageInterface.PageContext>(
     }
 
     open class PageContext(
-        open var page: Int
-    ) : Context()
+        open var page: Int = 0
+    ) : Context() {
+        companion object {
+            val defaultHandler = handler { PageContext() }
+        }
+    }
 
     data class Page<T : Context>(val page: Int, val items: List<InterfaceItem<T>>)
 

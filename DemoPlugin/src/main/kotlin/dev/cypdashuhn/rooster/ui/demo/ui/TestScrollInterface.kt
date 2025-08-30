@@ -3,7 +3,9 @@ package dev.cypdashuhn.rooster.ui.demo.ui
 import dev.cypdashuhn.rooster.common.util.createItem
 import dev.cypdashuhn.rooster.common.util.toComponent
 import dev.cypdashuhn.rooster.ui.interfaces.ClickInfo
+import dev.cypdashuhn.rooster.ui.interfaces.ContextHandler
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceInfo
+import dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content.ScrollContext
 import dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content.ScrollInterface
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -15,8 +17,8 @@ class Entry(
 )
 
 object TestScrollInterface :
-    ScrollInterface<ScrollInterface.ScrollContext, Entry>("test-scroll", ScrollContext::class) {
-
+    ScrollInterface<ScrollContext, Entry>("test-scroll"),
+    ContextHandler<ScrollContext> by ScrollContext.defaultHandler {
     val list = listOf(
         Entry("Robert", Material.DIAMOND),
         Entry("Peter", Material.BAKED_POTATO),

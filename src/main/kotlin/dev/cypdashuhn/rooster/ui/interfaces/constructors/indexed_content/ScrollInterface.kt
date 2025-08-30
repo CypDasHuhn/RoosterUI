@@ -3,28 +3,33 @@ package dev.cypdashuhn.rooster.ui.interfaces.constructors.indexed_content
 import dev.cypdashuhn.rooster.common.util.createItem
 import dev.cypdashuhn.rooster.ui.interfaces.Context
 import dev.cypdashuhn.rooster.ui.interfaces.Slot
+import dev.cypdashuhn.rooster.ui.interfaces.handler
 import dev.cypdashuhn.rooster.ui.items.InterfaceItem
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
-abstract class ScrollInterface<ContextType : ScrollInterface.ScrollContext, DataType : Any>(
+open class ScrollContext(
+    open var position: Int = 0
+) : Context() {
+    companion object {
+        val defaultHandler = handler { ScrollContext() }
+    }
+}
+
+open class ScrollInterfaceOptions<T : Context> : IndexedContentInterface.IndexedContentOptions<T>() {
+    var scrollDirection: ScrollInterface.ScrollDirection = ScrollInterface.ScrollDirection.TOP_BOTTOM
+
+    var modifyScroller: InterfaceItem<T>.() -> Unit = { }
+}
+
+abstract class ScrollInterface<ContextType : ScrollContext, DataType : Any>(
     override var interfaceName: String,
     val scrollOptions: ScrollInterfaceOptions<ContextType> = ScrollInterfaceOptions()
 ) : IndexedContentInterface<ContextType, Int, DataType>(interfaceName, scrollOptions) {
-    open class ScrollInterfaceOptions<T : Context> : IndexedContentOptions<T>() {
-        var scrollDirection: ScrollDirection = ScrollDirection.TOP_BOTTOM
-
-        var modifyScroller: InterfaceItem<T>.() -> Unit = { }
-    }
-
     enum class ScrollDirection {
         TOP_BOTTOM,
         LEFT_RIGHT
     }
-
-    open class ScrollContext(
-        open var position: Int = 0
-    ) : Context()
 
     private val rowSize: Int
         get() = if (scrollOptions.scrollDirection == ScrollDirection.LEFT_RIGHT) contentXWidth else contentYWidth
