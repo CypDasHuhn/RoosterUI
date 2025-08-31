@@ -19,13 +19,14 @@ class Entry(
 object TestScrollInterface :
     ScrollInterface<ScrollContext, Entry>("test-scroll"),
     ContextHandler<ScrollContext> by ScrollContext.defaultHandler {
-    val list = listOf(
+    val list = mutableListOf(
         Entry("Robert", Material.DIAMOND),
         Entry("Peter", Material.BAKED_POTATO),
         Entry("John", Material.BREAD),
         Entry("Jane", Material.BEETROOT),
         Entry("Stephan", Material.BAMBOO_BLOCK)
     )
+    val list2 = list + list + list + list + list + list + list
 
     override fun contentDisplay(
         data: Entry,
@@ -45,7 +46,7 @@ object TestScrollInterface :
         id: Int,
         context: ScrollContext
     ): Entry? {
-        return list.getOrNull(id)
+        return list2.getOrNull(id)
     }
 
     override fun defaultContext(player: Player): ScrollContext {

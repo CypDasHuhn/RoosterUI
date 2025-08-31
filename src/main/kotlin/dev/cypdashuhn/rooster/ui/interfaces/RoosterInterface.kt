@@ -82,10 +82,11 @@ abstract class RoosterInterface<T : Context>(
         val cachedItems = groupedItems[player]
         if (cachedItems != null) return cachedItems
 
-        val maxSlot = items
+        var maxSlot = items
             .mapNotNull { it.slots }
             .flatMap { it.slots.toList() }
             .maxOrNull() ?: return emptyMap()
+        if (maxSlot < 6 * 9) maxSlot = 6 * 9
 
         val map = mutableMapOf<Slot, InterfaceItemList<T>>()
         for (i in 0..maxSlot) {

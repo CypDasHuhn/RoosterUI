@@ -1,13 +1,6 @@
 package dev.cypdashuhn.rooster.common
 
 import java.util.logging.Logger
-import kotlin.collections.associateWith
-import kotlin.collections.filter
-import kotlin.collections.flatMap
-import kotlin.collections.joinToString
-import kotlin.collections.map
-import kotlin.collections.plus
-import kotlin.collections.toList
 
 interface WarningScaffold {
     var defaultValue: Boolean

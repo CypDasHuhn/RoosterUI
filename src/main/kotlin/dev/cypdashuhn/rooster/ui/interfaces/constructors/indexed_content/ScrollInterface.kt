@@ -17,9 +17,9 @@ open class ScrollContext(
 }
 
 open class ScrollInterfaceOptions<T : Context> : IndexedContentInterface.IndexedContentOptions<T>() {
-    var scrollDirection: ScrollInterface.ScrollDirection = ScrollInterface.ScrollDirection.TOP_BOTTOM
+    var scrollDirection: ScrollInterface.ScrollDirection = ScrollInterface.ScrollDirection.LEFT_RIGHT
 
-    var modifyScroller: InterfaceItem<T>.() -> Unit = { }
+    var modifyScroller: InterfaceItem<T>.() -> InterfaceItem<T> = { this }
 }
 
 abstract class ScrollInterface<ContextType : ScrollContext, DataType : Any>(
@@ -44,10 +44,7 @@ abstract class ScrollInterface<ContextType : ScrollContext, DataType : Any>(
 
                 context.position += scrollAmount
                 if (context.position < 0) context.position = 0
-            }.also {
-                scrollOptions.modifyScroller(it)
-            }
-
+            }.run(scrollOptions.modifyScroller)
 
     final override fun getFrameItems(): List<InterfaceItem<ContextType>> = listOf(
         scroller

@@ -37,7 +37,7 @@ abstract class IndexedContentInterface<ContextType : Context, IdType : Any, Data
     val contentXRange by lazy { contentAreaStartX..contentAreaEndX }
     val contentYRange by lazy { contentAreaStartY..contentAreaEndY }
 
-    val bottomRow by lazy { (contentAreaEndY + 1) * 9 }
+    val bottomRow by lazy { contentAreaEndY * 9 }
 
     /** Returns the Offset, the Relative being the upper left corner. */
     fun offset(slot: Slot): Pair<Int, Int>? {
