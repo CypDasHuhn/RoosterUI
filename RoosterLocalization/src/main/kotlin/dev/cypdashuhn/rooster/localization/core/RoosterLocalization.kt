@@ -2,12 +2,13 @@ package dev.cypdashuhn.rooster.localization.core
 
 import com.google.common.cache.CacheBuilder
 import dev.cypdashuhn.rooster.common.RoosterCache
-import dev.cypdashuhn.rooster.common.RoosterCommon
+import dev.cypdashuhn.rooster.common.RoosterModuleBuilder
 import dev.cypdashuhn.rooster.common.RoosterServices
+import dev.cypdashuhn.rooster.common.initRooster
 import dev.cypdashuhn.rooster.localization.provider.LocaleProvider
 import dev.cypdashuhn.rooster.localization.provider.YmlLocaleProvider
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
@@ -32,6 +33,10 @@ object RoosterLocalization {
             CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES)
         )
 
-        RoosterCommon.init(plugin)
+        initRooster(plugin, this.services, this.cache)
     }
+}
+
+fun RoosterModuleBuilder.localization() {
+    RoosterLocalization.init(plugin, services, cache)
 }

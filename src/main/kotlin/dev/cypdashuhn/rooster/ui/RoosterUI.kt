@@ -2,21 +2,18 @@ package dev.cypdashuhn.rooster.ui
 
 import com.google.common.cache.CacheBuilder
 import dev.cypdashuhn.rooster.common.RoosterCache
-import dev.cypdashuhn.rooster.common.RoosterCommon
+import dev.cypdashuhn.rooster.common.RoosterModuleBuilder
 import dev.cypdashuhn.rooster.common.RoosterServices
-import dev.cypdashuhn.rooster.localization.core.RoosterLocalization
-import dev.cypdashuhn.rooster.localization.provider.LocaleProvider
-import dev.cypdashuhn.rooster.localization.provider.YmlLocaleProvider
+import dev.cypdashuhn.rooster.common.initRooster
+import dev.cypdashuhn.rooster.localization.core.localization
 import dev.cypdashuhn.rooster.ui.context.InterfaceContextProvider
 import dev.cypdashuhn.rooster.ui.context.YmlInterfaceContextProvider
 import dev.cypdashuhn.rooster.ui.interfaces.InterfaceListener
 import dev.cypdashuhn.rooster.ui.interfaces.RoosterInterface
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
-import kotlin.text.set
 
 object RoosterUI {
     internal lateinit var plugin: JavaPlugin
@@ -47,7 +44,12 @@ object RoosterUI {
         val pluginManager = Bukkit.getPluginManager()
         pluginManager.registerEvents(InterfaceListener, plugin)
 
-        RoosterCommon.init(plugin)
-        RoosterLocalization.init(plugin = plugin, services = services, cache = cache)
+        initRooster(plugin) {
+            localization()
+        }
     }
+}
+
+fun RoosterModuleBuilder.ui(interfaces: List<RoosterInterface<*>>) {
+    RoosterUI.init(plugin, interfaces, services, cache)
 }
