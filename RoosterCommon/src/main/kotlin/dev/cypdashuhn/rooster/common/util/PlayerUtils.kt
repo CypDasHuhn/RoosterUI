@@ -1,5 +1,6 @@
 package dev.cypdashuhn.rooster.common.util
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.CommandSender
@@ -49,3 +50,6 @@ fun Player.giveItem(
 fun dropItemAtPlayer(player: Player, itemStack: ItemStack) {
     TODO("Drop")
 }
+
+fun t(translationKey: String, vararg value: Component) = Component.translatable(translationKey, *value)
+fun CommandSender.tSend(translationKey: String, vararg value: Component) = this.sendMessage(t(translationKey, *value))
