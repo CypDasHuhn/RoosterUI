@@ -53,3 +53,12 @@ fun dropItemAtPlayer(player: Player, itemStack: ItemStack) {
 
 fun t(translationKey: String, vararg value: Component) = Component.translatable(translationKey, *value)
 fun CommandSender.tSend(translationKey: String, vararg value: Component) = this.sendMessage(t(translationKey, *value))
+
+fun wrap(sender: CommandSender, errorMessage: String, block: () -> Unit) {
+    try {
+        block()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        sender.sendMessage(Component.translatable(errorMessage))
+    }
+}
